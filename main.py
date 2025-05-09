@@ -34,7 +34,7 @@ if __name__ == "__main__":
 
     # ...
 
-    splash_image_path = os.path.join(os.path.dirname(__file__) + "/RC", 'splash.png')
+    splash_image_path = os.path.join(os.path.dirname(__file__) + "\\RC", 'splash.png')
     print(f"splash_image_path = {splash_image_path}")  # TODO: در انتشار نهایی این را حذف کنم
     if os.path.exists(splash_image_path):
         splash_pix = QPixmap(splash_image_path)
