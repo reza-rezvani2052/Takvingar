@@ -18,12 +18,16 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
 from PySide6.QtWidgets import (QApplication, QDialog, QGridLayout, QHBoxLayout,
     QLabel, QPushButton, QSizePolicy, QSpacerItem,
     QWidget)
+import resources_rc
 
 class Ui_DialogAbout(object):
     def setupUi(self, DialogAbout):
         if not DialogAbout.objectName():
             DialogAbout.setObjectName(u"DialogAbout")
-        DialogAbout.resize(319, 453)
+        DialogAbout.resize(446, 453)
+        icon = QIcon()
+        icon.addFile(u":/app-icon.jpg", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
+        DialogAbout.setWindowIcon(icon)
         DialogAbout.setLayoutDirection(Qt.LayoutDirection.RightToLeft)
         DialogAbout.setModal(True)
         self.gridLayout = QGridLayout(DialogAbout)
@@ -79,9 +83,9 @@ class Ui_DialogAbout(object):
 "radius: 1.35, stop: 0 #fff, stop: 1 #888);\n"
 "}\n"
 "")
-        icon = QIcon()
-        icon.addFile(u":/icon/pic/OK.png", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
-        self.btnOk.setIcon(icon)
+        icon1 = QIcon()
+        icon1.addFile(u":/icon/pic/OK.png", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
+        self.btnOk.setIcon(icon1)
 
         self.horizontalLayout_2.addWidget(self.btnOk)
 

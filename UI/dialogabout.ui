@@ -6,12 +6,16 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>319</width>
+    <width>446</width>
     <height>453</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>درباره برنامه</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="../RC/resources.qrc">
+    <normaloff>:/app-icon.jpg</normaloff>:/app-icon.jpg</iconset>
   </property>
   <property name="layoutDirection">
    <enum>Qt::LayoutDirection::RightToLeft</enum>
@@ -119,6 +123,8 @@ radius: 1.35, stop: 0 #fff, stop: 1 #888);
    </item>
   </layout>
  </widget>
- <resources/>
+ <resources>
+  <include location="../RC/resources.qrc"/>
+ </resources>
  <connections/>
 </ui>

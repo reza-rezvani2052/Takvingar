@@ -1,0 +1,17 @@
+<RCC>
+    <qresource prefix="/">
+        <file>fonts/iran_sans.ttf</file>
+        <file>fonts/Vazir.ttf</file>
+        <file>help/index.html</file>
+        <file>img/about.png</file>
+        <file>img/close.png</file>
+        <file>img/feedback.png</file>
+        <file>img/help.png</file>
+        <file>img/options.png</file>
+        <file>img/save.png</file>
+        <file>splash.jpg</file>
+        <file>app-icon.jpg</file>
+        <file>img/backup.png</file>
+        <file>img/restore.png</file>
+    </qresource>
+</RCC>

@@ -90,6 +90,9 @@ CMakeLists.txt.user*
 __pycache__/
 .venv/
 
+rc_resources.py
+resources_rc.py
+
 *.lnk
 
 #Qt Creator :

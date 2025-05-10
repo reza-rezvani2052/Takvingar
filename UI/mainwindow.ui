@@ -6,12 +6,16 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1050</width>
-    <height>604</height>
+    <width>926</width>
+    <height>524</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>تکوینگر</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="../RC/resources.qrc">
+    <normaloff>:/app-icon.jpg</normaloff>:/app-icon.jpg</iconset>
   </property>
   <property name="layoutDirection">
    <enum>Qt::LayoutDirection::RightToLeft</enum>
@@ -59,6 +63,10 @@
           </property>
           <property name="text">
            <string>CommandLinkButton</string>
+          </property>
+          <property name="icon">
+           <iconset resource="../RC/resources.qrc">
+            <normaloff>:/img/about.png</normaloff>:/img/about.png</iconset>
           </property>
          </widget>
         </item>
@@ -115,7 +123,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1050</width>
+     <width>926</width>
      <height>25</height>
     </rect>
    </property>
@@ -123,6 +131,9 @@
     <property name="title">
      <string>فایل</string>
     </property>
+    <addaction name="actRestoreBackup"/>
+    <addaction name="actBckup"/>
+    <addaction name="separator"/>
     <addaction name="actQuit"/>
    </widget>
    <widget class="QMenu" name="menu_2">
@@ -166,6 +177,10 @@
    </attribute>
   </widget>
   <action name="actHelp">
+   <property name="icon">
+    <iconset resource="../RC/resources.qrc">
+     <normaloff>:/img/help.png</normaloff>:/img/help.png</iconset>
+   </property>
    <property name="text">
     <string>راهنمای برنامه</string>
    </property>
@@ -174,6 +189,10 @@
    </property>
   </action>
   <action name="actAbout">
+   <property name="icon">
+    <iconset resource="../RC/resources.qrc">
+     <normaloff>:/img/about.png</normaloff>:/img/about.png</iconset>
+   </property>
    <property name="text">
     <string>درباره برنامه</string>
    </property>
@@ -182,6 +201,10 @@
    </property>
   </action>
   <action name="actQuit">
+   <property name="icon">
+    <iconset resource="../RC/resources.qrc">
+     <normaloff>:/img/close.png</normaloff>:/img/close.png</iconset>
+   </property>
    <property name="text">
     <string>بستن</string>
    </property>
@@ -214,7 +237,33 @@
     <string>سهامداران</string>
    </property>
   </action>
+  <action name="actBckup">
+   <property name="icon">
+    <iconset resource="../RC/resources.qrc">
+     <normaloff>:/img/backup.png</normaloff>:/img/backup.png</iconset>
+   </property>
+   <property name="text">
+    <string>تهیه نسخه پشتیبان</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+B</string>
+   </property>
+  </action>
+  <action name="actRestoreBackup">
+   <property name="icon">
+    <iconset resource="../RC/resources.qrc">
+     <normaloff>:/img/restore.png</normaloff>:/img/restore.png</iconset>
+   </property>
+   <property name="text">
+    <string>بازیابی نسخه پشتیبان</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+R</string>
+   </property>
+  </action>
  </widget>
- <resources/>
+ <resources>
+  <include location="../RC/resources.qrc"/>
+ </resources>
  <connections/>
 </ui>
