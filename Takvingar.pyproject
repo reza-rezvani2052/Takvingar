@@ -2,10 +2,12 @@
     "files": [
         "RC/resources.qrc",
         "UI/dialogabout.ui",
+        "UI/dialoglogin.ui",
         "UI/mainwindow.ui",
         "main.py",
         "mainwindow.py",
         "dialogabout.py",
+        "dialoglogin.py",
         "build_ui.py",
         "build_bin.py",
         "TXT/NOTES.txt",
@@ -14,5 +16,6 @@
         "DB/history.py",
         "DB/settings.py",
         "DB/users.py"
+
     ]
 }

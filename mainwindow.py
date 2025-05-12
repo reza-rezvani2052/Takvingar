@@ -1,7 +1,10 @@
+import sys
+import subprocess
+
 from UI.ui_mainwindow import Ui_MainWindow
+from main import db_conn, write_app_settings
 
 from PySide6.QtCore import QSettings
-
 from PySide6.QtWidgets import (
     QApplication, QMainWindow, QMessageBox
 )
@@ -19,6 +22,7 @@ class MainWindow(QMainWindow):
 
     def connect_signals_to_slots(self):
         self.ui.actQuit.triggered.connect(self.actQuit_triggered)
+        self.ui.actRestartApp.triggered.connect(self.actRestartApp_triggered)
 
         self.ui.actAbout.triggered.connect(self.actAbout_triggered)
         self.ui.actHelp.triggered.connect(self.actHelp_triggered)
@@ -26,6 +30,18 @@ class MainWindow(QMainWindow):
         # self.ui.btnCancelProcess.clicked.connect(self.cancel_process)
 
     def actQuit_triggered(self):
+        self.prepare_to_close(write_settings=False)
+        QApplication.quit()
+
+    def actRestartApp_triggered(self):
+        self.prepare_to_close(write_settings=False)
+
+        # ...
+        # NOTE:
+        # در پای چارم، هنگام ریست برنامه، خوب همل نمیکنه اما اگر از خط فرمان
+        # اجرا شود مشکلی ندارد. بعدا در انتشار نهایی برنامه این را تست کنم
+
+        subprocess.Popen([sys.executable] + sys.argv)
         QApplication.quit()
 
     def actHelp_triggered(self):
@@ -34,6 +50,9 @@ class MainWindow(QMainWindow):
 
         url = QUrl.fromLocalFile("RC/help/index.html")
         QDesktopServices.openUrl(url)
+        # ...
+        # import webbrowser
+        # webbrowser.open("https://www.google.com/")
 
     def actAbout_triggered(self):
         from dialogabout import DialogAbout
@@ -42,9 +61,21 @@ class MainWindow(QMainWindow):
 
     # ..........................................................................
 
+    def prepare_to_close(self, write_settings=True):
+        if write_settings:
+            self.save_settings()
+            write_app_settings()
+
+        if db_conn.isOpen():
+            db_conn.close()
+
     def closeEvent(self, event):
-        self.save_settings()
+        # اگر بعدا سیستم تری به برنامه اضافه کردم، باید مواظب باشم که در صورت
+        # رفتن برنامه به سیستم تری، در فراخوانی تابع زیر کانکشن پایگاه داده بسته نشه
+        self.prepare_to_close(write_settings=True)
+
         super().closeEvent(event)
+
         """
         reply = QMessageBox.question(
             self, "Exit", "Are you sure you want to exit?",

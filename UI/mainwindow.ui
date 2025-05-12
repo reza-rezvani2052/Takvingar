@@ -134,7 +134,9 @@
     <addaction name="actRestoreBackup"/>
     <addaction name="actBckup"/>
     <addaction name="separator"/>
+    <addaction name="actRestartApp"/>
     <addaction name="actQuit"/>
+    <addaction name="separator"/>
    </widget>
    <widget class="QMenu" name="menu_2">
     <property name="title">
@@ -206,7 +208,7 @@
      <normaloff>:/img/close.png</normaloff>:/img/close.png</iconset>
    </property>
    <property name="text">
-    <string>بستن</string>
+    <string>بستن برنامه</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+Q</string>
@@ -259,6 +261,15 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+Shift+R</string>
+   </property>
+  </action>
+  <action name="actRestartApp">
+   <property name="icon">
+    <iconset resource="../RC/resources.qrc">
+     <normaloff>:/img/restart-app.png</normaloff>:/img/restart-app.png</iconset>
+   </property>
+   <property name="text">
+    <string>راه اندازی مجد</string>
    </property>
   </action>
  </widget>
