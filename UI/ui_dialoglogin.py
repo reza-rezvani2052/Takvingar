@@ -25,7 +25,7 @@ class Ui_DialogLogin(object):
     def setupUi(self, DialogLogin):
         if not DialogLogin.objectName():
             DialogLogin.setObjectName(u"DialogLogin")
-        DialogLogin.resize(325, 442)
+        DialogLogin.resize(338, 453)
         icon = QIcon()
         icon.addFile(u":/app-icon.jpg", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
         DialogLogin.setWindowIcon(icon)
@@ -176,7 +176,6 @@ class Ui_DialogLogin(object):
         sizePolicy2.setHeightForWidth(self.btnLogIn.sizePolicy().hasHeightForWidth())
         self.btnLogIn.setSizePolicy(sizePolicy2)
         self.btnLogIn.setMinimumSize(QSize(88, 38))
-        self.btnLogIn.setAutoDefault(True)
 
         self.horizontalLayout_4.addWidget(self.btnLogIn)
 
@@ -313,10 +312,14 @@ class Ui_DialogLogin(object):
         QWidget.setTabOrder(self.btnRegister, self.btnCancelRegistrationPage)
 
         self.retranslateUi(DialogLogin)
+        self.ledUsernameRegistrationPage.returnPressed.connect(self.ledPasswordRegistrationPage.setFocus)
+        self.ledPasswordRegistrationPage.returnPressed.connect(self.ledPasswordAgainRegistrationPage.setFocus)
+        self.ledPasswordAgainRegistrationPage.returnPressed.connect(self.ledPasswordHint.setFocus)
+        self.ledPasswordHint.returnPressed.connect(self.btnRegister.click)
+        self.ledUsername.returnPressed.connect(self.ledPassword.setFocus)
+        self.ledPassword.returnPressed.connect(self.btnLogIn.click)
 
-        self.stackedWidgetMain.setCurrentIndex(1)
-        self.btnLogIn.setDefault(True)
-        self.btnRegister.setDefault(True)
+        self.stackedWidgetMain.setCurrentIndex(0)
 
 
         QMetaObject.connectSlotsByName(DialogLogin)
@@ -325,7 +328,7 @@ class Ui_DialogLogin(object):
     def retranslateUi(self, DialogLogin):
         DialogLogin.setWindowTitle(QCoreApplication.translate("DialogLogin", u"\u0648\u0631\u0648\u062f", None))
         self.ledPassword.setText(QCoreApplication.translate("DialogLogin", u"123456", None))
-        self.ledUsername.setText(QCoreApplication.translate("DialogLogin", u"root", None))
+        self.ledUsername.setText(QCoreApplication.translate("DialogLogin", u"admin", None))
         self.lblUserName.setText(QCoreApplication.translate("DialogLogin", u"\u0646\u0627\u0645 \u06a9\u0627\u0631\u0628\u0631\u06cc", None))
         self.lblPassword.setText(QCoreApplication.translate("DialogLogin", u"\u06a9\u0644\u0645\u0647 \u0639\u0628\u0648\u0631", None))
 #if QT_CONFIG(tooltip)

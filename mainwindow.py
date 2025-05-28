@@ -1,13 +1,24 @@
+import os
 import sys
+import shutil
 import subprocess
 
-from UI.ui_mainwindow import Ui_MainWindow
-from main import db_conn, write_app_settings
+from datetime import datetime
+import jdatetime  # تاریخ شمسی
 
 from PySide6.QtCore import QSettings
-from PySide6.QtWidgets import (
-    QApplication, QMainWindow, QMessageBox
-)
+from PySide6.QtGui import QIcon
+from PySide6.QtWidgets import (QApplication, QFileDialog, QMainWindow, QMessageBox)
+
+# اگر دسترسی خواندنی و نوشتنی به متغیرهای سراسری  بخواهیم
+# باید دستور ایمپورت را به صورت زیر بنویسیم
+# اگر از from استفاده کنیم، فقط دسترسی خواندنی داریم
+import DB.database
+import DB.settings
+from definitions import app_info, app_settings
+from dialogpopup import DialogPopup
+from main import write_app_settings
+from UI.ui_mainwindow import Ui_MainWindow
 
 
 class MainWindow(QMainWindow):
@@ -15,7 +26,8 @@ class MainWindow(QMainWindow):
         super().__init__(parent)
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
-        self.load_settings()
+        self.ui.toolBar.setWindowTitle("نوار ابزار")
+        self.read_settings()
         # ...
         self.connect_signals_to_slots()
         # ...
@@ -24,10 +36,115 @@ class MainWindow(QMainWindow):
         self.ui.actQuit.triggered.connect(self.actQuit_triggered)
         self.ui.actRestartApp.triggered.connect(self.actRestartApp_triggered)
 
-        self.ui.actAbout.triggered.connect(self.actAbout_triggered)
-        self.ui.actHelp.triggered.connect(self.actHelp_triggered)
+        self.ui.actBackup.triggered.connect(self.actBackup_triggered)
+        self.ui.actRestoreBackup.triggered.connect(self.actRestoreBackup_triggered)
 
-        # self.ui.btnCancelProcess.clicked.connect(self.cancel_process)
+        self.ui.actHelp.triggered.connect(self.actHelp_triggered)
+        self.ui.actAbout.triggered.connect(self.actAbout_triggered)
+
+    def create_db_backup(self, show_message=True, auto_backup=False) -> tuple[bool, str]:
+        # ایجاد نام پیش‌فرض با تاریخ و زمان جاری به شمسی
+        now_gregorian = datetime.now()
+        now_jalali = jdatetime.datetime.fromgregorian(datetime=now_gregorian)
+        default_name = f"backup_{now_jalali.strftime('%Y-%m-%d_%H-%M-%S')}.db"
+        # ...
+        # گرفتن مسیر ذخیره‌سازی از کاربر
+        # اگر بکاپ بصورت سیستمی و خودکار است نیازی به بازشدن دیالوگ زیر نیست
+        if auto_backup:
+            show_message = False  # اگر بکاپ خودکار هست، پیام‌ها نباید به کاربر نشان داده شود
+            dest_path = default_name
+        else:
+            dest_path, _ = QFileDialog.getSaveFileName(
+                    self, "ذخیره نسخه پشتیبان",
+                    default_name, "Database Files (*.db)"
+                    )
+        # ...
+        if dest_path:
+            try:
+                if not dest_path.lower().endswith(".db"):  # اطمینان از داشتن پسوند .db
+                    dest_path += ".db"
+
+                # بررسی وجود فایل مبدا
+                if not os.path.exists(DB.database.Connections['CONN_DATA']['PATH']):
+                    err_msg = f"فایل پایگاه داده یافت نشد:\n{DB.database.Connections['CONN_DATA']['PATH']}"
+                    if show_message:
+                        QMessageBox.critical(self, "خطا", err_msg)
+                    return False, err_msg
+
+                # کپی فایل
+                shutil.copy2(DB.database.Connections['CONN_DATA']['PATH'], dest_path)
+                _msg = "✅ نسخه پشتیبان با موفقیت ذخیره شد" + "\n" + dest_path
+                if show_message:
+                    DialogPopup(_msg, duration=4000, parent=self).show()
+
+                return True, _msg
+
+            except Exception as e:
+                err_msg = f"در هنگام پشتیبان‌گیری خطایی رخ داد:\n{str(e)}"
+                if show_message:
+                    QMessageBox.critical(self, "خطا", err_msg)
+                return False, err_msg
+
+        _msg = "نسخه پشتیبان با موفقیت ذخیره شد"
+        return True, _msg
+
+    def actBackup_triggered(self):
+        self.create_db_backup(show_message=True)
+        # self.create_db_backup(show_message=False, auto_backup=True)
+
+    @staticmethod
+    def are_paths_equal(path1, path2):
+        abs_path1 = os.path.abspath(os.path.realpath(path1))
+        abs_path2 = os.path.abspath(os.path.realpath(path2))
+        return abs_path1 == abs_path2
+
+    def actRestoreBackup_triggered(self):
+        # TODO:  اول فایلهای باز و نیمه کاره چک شوند و درصورت نیاز کاربر، ذخیره گردند
+        # همچنین اگر نیاز بود به کاربر هشدار دهم تا تمامی پنجره ها را یا ذخیره
+        # و یا ببندد
+        # ...
+        msg_box = QMessageBox(self)
+        msg_box.setWindowTitle("راه اندازی مجدد")
+        msg_box.setText(
+                "پس از بازیابی نسخه پشتیبان، برنامه بسته و دوباره اجرا خواهد شد"
+                "\n" + "آیا مایل به ادامه کار هستید؟",
+                )
+        msg_box.setIcon(QMessageBox.Question)
+        msg_box.setWindowIcon(QIcon(":/app-icon.jpg"))
+        yes_button = msg_box.addButton("بله", QMessageBox.YesRole)
+        no_button = msg_box.addButton("خیر", QMessageBox.NoRole)
+        msg_box.setDefaultButton(yes_button)
+        msg_box.exec()
+
+        if msg_box.clickedButton() == yes_button:
+
+            new_db_path = DB.database.choose_database_file()
+            if not new_db_path:  # کاربر کنسل کرد
+                return
+
+            if self.are_paths_equal(
+                    new_db_path, DB.database.Connections['CONN_DATA']['PATH']
+                    ):
+                _msg = "فایل انتخاب‌شده برای بازگردانی، همان فایل پایگاه‌داده فعلی است.\n" \
+                       "لطفاً یک فایل بکاپ متفاوت انتخاب کنید."
+                DialogPopup(_msg, duration=6000, parent=self).show()
+                return
+
+            # ...
+            # نیاز نیست که بررسی شود اینکه فایل واقعاً دیتابیس معتبر SQLite هست یا نه
+            # چون باعث پیچیدگی در تابع
+            #
+            # میشد. مضاف بر این بعد از اجرای مجدد برنامه، این مورد بررسی میشود
+            # status, message = DB.database.is_valid_sqlite_file("CONN_DATA")
+            # ...
+
+            app_settings.db_data_path = new_db_path
+            DB.database.Connections['CONN_DATA']['PATH'] = new_db_path
+
+            self.prepare_to_close(write_settings=True)
+            self.actRestartApp_triggered()
+        else:
+            return
 
     def actQuit_triggered(self):
         self.prepare_to_close(write_settings=False)
@@ -38,13 +155,14 @@ class MainWindow(QMainWindow):
 
         # ...
         # NOTE:
-        # در پای چارم، هنگام ریست برنامه، خوب همل نمیکنه اما اگر از خط فرمان
+        # در پای چارم، هنگام ریست برنامه، خوب عمل نمیکنه اما اگر از خط فرمان
         # اجرا شود مشکلی ندارد. بعدا در انتشار نهایی برنامه این را تست کنم
 
         subprocess.Popen([sys.executable] + sys.argv)
         QApplication.quit()
 
-    def actHelp_triggered(self):
+    @staticmethod
+    def actHelp_triggered():
         from PySide6.QtCore import QUrl
         from PySide6.QtGui import QDesktopServices
 
@@ -63,11 +181,10 @@ class MainWindow(QMainWindow):
 
     def prepare_to_close(self, write_settings=True):
         if write_settings:
-            self.save_settings()
+            self.write_settings()
             write_app_settings()
 
-        if db_conn.isOpen():
-            db_conn.close()
+        DB.database.close_all_db_connections()
 
     def closeEvent(self, event):
         # اگر بعدا سیستم تری به برنامه اضافه کردم، باید مواظب باشم که در صورت
@@ -76,25 +193,13 @@ class MainWindow(QMainWindow):
 
         super().closeEvent(event)
 
-        """
-        reply = QMessageBox.question(
-            self, "Exit", "Are you sure you want to exit?",
-            QMessageBox.Yes | QMessageBox.No
-        )
-        if reply == QMessageBox.Yes:
-            # اینجا می‌تونی هر کار تمیزکاری (cleanup) انجام بدی
-            event.accept()
-        else:
-            event.ignore()
-        """
-
-    def load_settings(self):
-        settings = QSettings("Takvingar", "MainWindow")
+    def read_settings(self):
+        settings = QSettings(app_info.application_name_en, "MainWindow")
         self.restoreGeometry(settings.value("geometry", b""))
         self.restoreState(settings.value("window_state", b""))
 
-    def save_settings(self):
-        settings = QSettings("Takvingar", "MainWindow")
+    def write_settings(self):
+        settings = QSettings(app_info.application_name_en, "MainWindow")
         settings.setValue("geometry", self.saveGeometry())
         settings.setValue("window_state", self.saveState())
 

@@ -31,8 +31,58 @@ class Ui_MainWindow(object):
         icon.addFile(u":/app-icon.jpg", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
         MainWindow.setWindowIcon(icon)
         MainWindow.setLayoutDirection(Qt.LayoutDirection.RightToLeft)
+        MainWindow.setStyleSheet(u"QMenuBar{\n"
+"     	background-color: lightgray; \n"
+"       color: rgb(0, 0, 106);\n"
+"}\n"
+"\n"
+"QMenuBar::item {\n"
+"        padding: 4px 8px;\n"
+"        border:1px solid transparent;\n"
+"}\n"
+"QMenuBar::item:selected { /* when selected using mouse or keyboard */\n"
+"        background:  #a8a8a8; \n"
+"        border:1px solid rgb(127, 127, 127);\n"
+"        background-color: qlineargradient(spread:pad, x1:0, y1:1, x2:0, y2:0, stop:0 rgba(190, 190, 190, 255), stop:1 rgba(255, 255, 255, 255));\n"
+"}\n"
+"QMenuBar::item:pressed {\n"
+"        border-color:rgb(127, 127, 127);\n"
+"        border-style: solid;\n"
+"        border-width:1px 1px 0 1px;\n"
+"        /*background-color: qlineargradient(spread:pad, x1:0, y1:1, x2:0, y2:0,\n"
+"                stop:0 rgba(255, 255, 255, 255),\n"
+"                stop:1 rgba(190, 190, 190, 255));*/\n"
+"        background-color: rgb(186, 186, 186);\n"
+"}\n"
+"\n"
+"\n"
+"/*---------------------------------*/\n"
+"\n"
+"QToolBar {\n"
+"        border: 1px solid rgb(80,80,80);\n"
+" "
+                        "       background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0 rgba(255, 255, 255, 255), stop:0.485876 rgba(175, 175, 175, 255), stop:0.525424 rgba(140, 140, 140, 255), stop:1 rgba(150, 150, 150, 255));\n"
+"        border-radius: 0px;\n"
+"}\n"
+"\n"
+"QToolBar::handle {\n"
+"    border:1px solid rgb(80,80,80);\n"
+"        margin: 3px 5px 2px 5px;\n"
+"        border-radius: 5px;\n"
+"}\n"
+"\n"
+"/*---------------------------------*/\n"
+"\n"
+"QStatusBar {\n"
+"        background-color: lightgray ;\n"
+"        color: rgb(0, 0, 106);\n"
+"}\n"
+"\n"
+"/*---------------------------------*/\n"
+"")
         self.actHelp = QAction(MainWindow)
         self.actHelp.setObjectName(u"actHelp")
+        self.actHelp.setEnabled(False)
         icon1 = QIcon()
         icon1.addFile(u":/img/help.png", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
         self.actHelp.setIcon(icon1)
@@ -56,11 +106,11 @@ class Ui_MainWindow(object):
         self.action_7.setObjectName(u"action_7")
         self.action_8 = QAction(MainWindow)
         self.action_8.setObjectName(u"action_8")
-        self.actBckup = QAction(MainWindow)
-        self.actBckup.setObjectName(u"actBckup")
+        self.actBackup = QAction(MainWindow)
+        self.actBackup.setObjectName(u"actBackup")
         icon4 = QIcon()
         icon4.addFile(u":/img/backup.png", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
-        self.actBckup.setIcon(icon4)
+        self.actBackup.setIcon(icon4)
         self.actRestoreBackup = QAction(MainWindow)
         self.actRestoreBackup.setObjectName(u"actRestoreBackup")
         icon5 = QIcon()
@@ -143,7 +193,7 @@ class Ui_MainWindow(object):
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QMenuBar(MainWindow)
         self.menubar.setObjectName(u"menubar")
-        self.menubar.setGeometry(QRect(0, 0, 926, 25))
+        self.menubar.setGeometry(QRect(0, 0, 926, 30))
         self.menu = QMenu(self.menubar)
         self.menu.setObjectName(u"menu")
         self.menu_2 = QMenu(self.menubar)
@@ -152,6 +202,8 @@ class Ui_MainWindow(object):
         self.menu_3.setObjectName(u"menu_3")
         self.menulndvdj = QMenu(self.menubar)
         self.menulndvdj.setObjectName(u"menulndvdj")
+        self.menu_4 = QMenu(self.menubar)
+        self.menu_4.setObjectName(u"menu_4")
         MainWindow.setMenuBar(self.menubar)
         self.statusbar = QStatusBar(MainWindow)
         self.statusbar.setObjectName(u"statusbar")
@@ -162,10 +214,11 @@ class Ui_MainWindow(object):
 
         self.menubar.addAction(self.menu.menuAction())
         self.menubar.addAction(self.menulndvdj.menuAction())
+        self.menubar.addAction(self.menu_4.menuAction())
         self.menubar.addAction(self.menu_2.menuAction())
         self.menubar.addAction(self.menu_3.menuAction())
         self.menu.addAction(self.actRestoreBackup)
-        self.menu.addAction(self.actBckup)
+        self.menu.addAction(self.actBackup)
         self.menu.addSeparator()
         self.menu.addAction(self.actRestartApp)
         self.menu.addAction(self.actQuit)
@@ -178,6 +231,12 @@ class Ui_MainWindow(object):
         self.menulndvdj.addAction(self.action_5)
         self.menulndvdj.addAction(self.action_7)
         self.menulndvdj.addAction(self.action_8)
+        self.toolBar.addAction(self.actBackup)
+        self.toolBar.addAction(self.actRestoreBackup)
+        self.toolBar.addSeparator()
+        self.toolBar.addAction(self.actQuit)
+        self.toolBar.addSeparator()
+        self.toolBar.addAction(self.actAbout)
 
         self.retranslateUi(MainWindow)
 
@@ -201,14 +260,14 @@ class Ui_MainWindow(object):
 #if QT_CONFIG(shortcut)
         self.actQuit.setShortcut(QCoreApplication.translate("MainWindow", u"Ctrl+Q", None))
 #endif // QT_CONFIG(shortcut)
-        self.action_4.setText(QCoreApplication.translate("MainWindow", u"\u0645\u062d\u0627\u0633\u0628\u0647 \u06a9\u0627\u0631\u0645\u0632\u062f", None))
+        self.action_4.setText(QCoreApplication.translate("MainWindow", u"\u0645\u062d\u0627\u0633\u0628\u0647 \u06a9\u0627\u0631\u0645\u0632\u062f \u0628\u0627\u0646\u06a9", None))
         self.action_6.setText(QCoreApplication.translate("MainWindow", u"\u0641\u0627\u06a9\u062a\u0648\u0631 \u0646\u0648\u06cc\u0633", None))
         self.action_5.setText(QCoreApplication.translate("MainWindow", u"\u067e\u0631\u0648\u0698\u0647\u200c\u0647\u0627", None))
         self.action_7.setText(QCoreApplication.translate("MainWindow", u"\u067e\u0631\u0633\u0646\u0644", None))
         self.action_8.setText(QCoreApplication.translate("MainWindow", u"\u0633\u0647\u0627\u0645\u062f\u0627\u0631\u0627\u0646", None))
-        self.actBckup.setText(QCoreApplication.translate("MainWindow", u"\u062a\u0647\u06cc\u0647 \u0646\u0633\u062e\u0647 \u067e\u0634\u062a\u06cc\u0628\u0627\u0646", None))
+        self.actBackup.setText(QCoreApplication.translate("MainWindow", u"\u062a\u0647\u06cc\u0647 \u0646\u0633\u062e\u0647 \u067e\u0634\u062a\u06cc\u0628\u0627\u0646", None))
 #if QT_CONFIG(shortcut)
-        self.actBckup.setShortcut(QCoreApplication.translate("MainWindow", u"Ctrl+Shift+B", None))
+        self.actBackup.setShortcut(QCoreApplication.translate("MainWindow", u"Ctrl+Shift+B", None))
 #endif // QT_CONFIG(shortcut)
         self.actRestoreBackup.setText(QCoreApplication.translate("MainWindow", u"\u0628\u0627\u0632\u06cc\u0627\u0628\u06cc \u0646\u0633\u062e\u0647 \u067e\u0634\u062a\u06cc\u0628\u0627\u0646", None))
 #if QT_CONFIG(shortcut)
@@ -222,6 +281,7 @@ class Ui_MainWindow(object):
         self.menu_2.setTitle(QCoreApplication.translate("MainWindow", u"\u0627\u0628\u0632\u0627\u0631\u0647\u0627", None))
         self.menu_3.setTitle(QCoreApplication.translate("MainWindow", u"\u0631\u0627\u0647\u0646\u0645\u0627", None))
         self.menulndvdj.setTitle(QCoreApplication.translate("MainWindow", u"\u0645\u062f\u06cc\u0631\u06cc\u062a", None))
+        self.menu_4.setTitle(QCoreApplication.translate("MainWindow", u"\u06af\u0632\u0627\u0631\u0634\u0627\u062a", None))
         self.toolBar.setWindowTitle(QCoreApplication.translate("MainWindow", u"toolBar", None))
     # retranslateUi
 

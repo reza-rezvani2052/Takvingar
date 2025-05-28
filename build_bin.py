@@ -20,44 +20,34 @@ for folder in ["build", "dist"]:
         shutil.rmtree(folder_path)
 
 # ماژول‌هایی که می‌خواهیم حذف کنیم
-excluded_modules = [
-    "PyQt5", "PyQt6", "PyQt5.sip", "PyQt6.sip",
-    "IPython", "cv2", "pygame", "torch", "transformers",
-    "sklearn", "scikit_learn", "sentencepiece", "protobuf",
-    "gevent", "sqlalchemy", "tornado", "zmq", "yaml", "nltk",
-    "pandas",
+excluded_modules = ["PyQt5", "PyQt6", "PyQt5.sip", "PyQt6.sip", ]
 
-    "matplotlib.tests",
-
-    # اینها باید در پروژه من باشند. سایر ماژول ها به اینها وابستگی دارند
-    # "numpy", "numpy.libs",            # numpy-2.2.4
-    # "PIL",                            # pillow-10.4.0
-    # "dateutil", "python-dateutil",    # python-dateutil-2.9.0.post0
-    # "kiwisolver",                     # kiwisolver-1.4.8
-    # "bidi",                           # python-bidi-0.6.6
-
-    # اینها را هنوز تست نکردم
-    # "psutil",
-    # "markupsafe",
-    # "contourpy",  # contourpy-1.3.2
-    # "cryptography", "hazmat",  # _rust.pyd
-    # "fontTools",  # fonttools-4.57.0
-
+# لیست ماژول‌های hidden-import
+hidden_imports = [
+    "bcrypt", "shiboken6", "PySide6",
+    "jalali_core", "jdatetime",
 ]
 
 # ساخت دستور pyinstaller
 cmd = [
     "pyinstaller",
     "--noconfirm",
-    # "--windowed",             #TODO: در انتشار نهایی این را تغییر بدهم
+    "--windowed",  # TODO: در انتشار نهایی این گزینه فعال باشد
     "--onedir",
+    # "--onefile",
     f"--icon={ICON_PATH}",
     f"--name={APP_NAME}",
 ]
 
+# اضافه کردن hidden-import ها به دستور
+for hidden_import in hidden_imports:
+    cmd.append(f"--hidden-import={hidden_import}")
+
 # اضافه کردن exclude-module به دستور
 for module in excluded_modules:
     cmd.append(f"--exclude-module={module}")
+
+cmd.append(f"--paths={str(Path(BASE_DIR).joinpath('.venv', 'Lib', 'site-packages'))}")
 
 cmd.append(str(MAIN_SCRIPT))
 

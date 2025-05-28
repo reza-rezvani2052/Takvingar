@@ -1,14 +1,16 @@
 import re
 
-from dialogdraggable import DialogDraggable
 from UI.ui_dialoglogin import Ui_DialogLogin
+from dialogpopup import DialogPopup
+from dialogdraggable import DialogDraggable
 
 from definitions import Direction, user_info
-from DB.database import (add_user_to_db, get_pass_hint, get_all_username,
-                         update_settings, check_password)
+from DB.users import (add_user_to_db, get_pass_hint, get_all_username,
+                      check_password)
+from DB.settings import update_settings
 
 from PySide6.QtCore import Qt, QPoint, QEasingCurve, QPropertyAnimation
-from PySide6.QtWidgets import QMessageBox, QStackedWidget, QWidget, QCompleter
+from PySide6.QtWidgets import QStackedWidget, QWidget, QCompleter
 from PySide6.QtGui import QKeyEvent, QCloseEvent
 
 
@@ -19,6 +21,9 @@ class DialogLogin(DialogDraggable):
         self.ui.setupUi(self)
         self.setWindowFlags(Qt.SplashScreen | Qt.WindowStaysOnTopHint)
 
+        # popup dialog
+        self.popup = None
+
         self.list_usernames = get_all_username()
         completer = QCompleter(self.list_usernames)
         completer.setCaseSensitivity(Qt.CaseInsensitive)
@@ -27,10 +32,12 @@ class DialogLogin(DialogDraggable):
 
         self._is_user_registered_successfully = False
 
+        # جلوگیری از حملات بروت فورث و هک شدن پسورد
+        self.failed_attempts = 0  # شمارنده تلاش‌های ناموفق ورود به برنامه - پسورد اشتباه
+
         # ...
         if show_login_page:
             self.ui.stackedWidgetMain.setCurrentWidget(self.ui.pageLogin)
-            print(self.list_usernames)  # TODO: ***  QCompleter...
         else:
             self.ui.stackedWidgetMain.setCurrentWidget(self.ui.pageRegistration)
         # ...
@@ -52,19 +59,43 @@ class DialogLogin(DialogDraggable):
         self.close()
 
     def btnLogIn_clicked(self):
+        if self.failed_attempts >= 3:
+            self.popup = DialogPopup(
+                    "تعداد تلاش های ورود به برنامه بیش از حد مجاز است" + "\n" +
+                    "جهت یادآوری کلمه عبور از دکمه 'یادآوری کلمه عبور' استفاده کنید "
+                    , duration=6000, parent=self
+                    )
+            self.popup.show()
+            self.ui.ledUsername.setEnabled(False)
+            self.ui.ledPassword.setEnabled(False)
+            self.ui.btnLogIn.setEnabled(False)
+            return
+
         username = self.ui.ledUsername.text().strip()
         password = self.ui.ledPassword.text()
         ret = check_password(username, password)
         if not ret:
-            QMessageBox.warning(self, "ورود ناموفق",
-                                "نام کاربری یا کلمه عبور نادرست است")
+            self.failed_attempts += 1
+            remaining = 3 - self.failed_attempts
+
+            self.popup = DialogPopup(
+                    "نام کاربری یا کلمه عبور نادرست است" + "\n" +
+                    "تعداد تلاش باقی مانده:" + "\n"
+                                                f" {remaining} "
+                    , duration=2500, parent=self
+                    )
+            self.popup.show()
+
         else:
             self.animateAndAccept()
 
     def btnPasswordHint_clicked(self):
         username = self.ui.ledUsername.text().strip()
         if not username:
-            QMessageBox.warning(self, "ورود نام کاربری", "لطفاً نام کاربری را وارد کنید.")
+            DialogPopup(
+                    "لطفاً نام کاربری را وارد کنید"
+                    , duration=2500, parent=self
+                    ).show()
             self.ui.ledUsername.setFocus()
             return
 
@@ -72,13 +103,16 @@ class DialogLogin(DialogDraggable):
         if not ret:
             ret = "چیزی یافت نشد"
 
-        QMessageBox.information(self, "راهنمای کلمه عبور", ret)
+        self.popup = DialogPopup(ret, duration=2500, parent=self)
+        self.popup.show()
 
     # ------------------------------------------------------------------------
 
     def btnGoToLoginPage_clicked(self):
         if self.ui.stackedWidgetMain.currentWidget() != self.ui.pageLogin:
-            self.animateStackedWidgetPages(self.ui.stackedWidgetMain, self.ui.pageLogin)
+            self.animateStackedWidgetPages(
+                    self.ui.stackedWidgetMain, self.ui.pageLogin
+                    )
 
     def btnRegister_clicked(self):
         if not self.validate_registration():  # پیام های خطای احتمالی در همان تابع نمایش داده میشود
@@ -91,11 +125,16 @@ class DialogLogin(DialogDraggable):
         success, message = self.register_user(username, password, reminder)
         if success:
             self._is_user_registered_successfully = True
-            self.ui.stackedWidgetMain.setCurrentWidget(self.ui.pageLogin)
+            self.write_settings()
+
+            self.btnGoToLoginPage_clicked()  # animate and go to Login Page!
             self.ui.ledUsername.setText(username)
             self.ui.ledPassword.setFocus()
         else:
-            QMessageBox.warning(self, "خطا", "ثبت کاربر با خطا مواجه شده است." + "\n" + message)
+            DialogPopup(
+                    "ثبت کاربر با خطا مواجه شده است." + "\n" + message
+                    , duration=3500, parent=self
+                    ).show()
 
     def validate_registration(self):
         username = self.ui.ledUsernameRegistrationPage.text().strip()
@@ -105,34 +144,37 @@ class DialogLogin(DialogDraggable):
 
         # بررسی تکمیل بودن فیلدها
         if not username:
-            QMessageBox.warning(self, "خطا", "لطفاً نام کاربری را وارد کنید.")
+            DialogPopup("لطفاً نام کاربری را وارد کنید", duration=2500, parent=self).show()
             self.ui.ledUsernameRegistrationPage.setFocus()
             return False
 
         if not password:
-            QMessageBox.warning(self, "خطا", "لطفاً کلمه عبور را وارد کنید.")
+            DialogPopup("لطفاً کلمه عبور را وارد کنید", duration=2500, parent=self).show()
             self.ui.ledPasswordRegistrationPage.setFocus()
             return False
 
         if not password_again:
-            QMessageBox.warning(self, "خطا", "لطفاً تکرار کلمه عبور را وارد کنید.")
+            DialogPopup("لطفاً تکرار کلمه عبور را وارد کنید", duration=2500, parent=self).show()
             self.ui.ledPasswordAgainRegistrationPage.setFocus()
             return False
 
         if not reminder:
-            QMessageBox.warning(self, "خطا", "لطفاً یادآوری کلمه عبور را وارد کنید.")
+            DialogPopup("لطفاً یادآوری کلمه عبور را وارد کنید", duration=2500, parent=self).show()
             self.ui.ledPasswordHint.setFocus()
             return False
 
         # بررسی معتبر بودن نام کاربری (حداقل 4 حرف شامل حروف انگلیسی، عدد، زیرخط)
         if not re.fullmatch(r"[A-Za-z0-9_]{4,}", username):
-            QMessageBox.warning(self, "خطا", "نام کاربری باید حداقل ۴ حرف و شامل حروف، عدد یا زیرخط (_) باشد.")
+            DialogPopup(
+                    "نام کاربری باید حداقل ۴ حرف و شامل حروف، عدد یا زیرخط (_) باشد", duration=3500,
+                    parent=self
+                    ).show()
             self.ui.ledUsernameRegistrationPage.setFocus()
             return False
 
         # بررسی تطابق کلمه عبور و تکرار آن
         if password != password_again:
-            QMessageBox.warning(self, "خطا", "کلمه عبور و تکرار آن یکسان نیستند.")
+            DialogPopup("کلمه عبور و تکرار آن یکسان نیستند", duration=2500, parent=self).show()
             self.ui.ledPasswordAgainRegistrationPage.setFocus()
             return False
 
@@ -140,7 +182,10 @@ class DialogLogin(DialogDraggable):
         for i in range(len(password) - 3):
             substring = password[i:i + 4].lower()
             if substring in reminder.lower():
-                QMessageBox.warning(self, "خطا", "عبارت یادآوری نباید شامل بخش‌هایی از کلمه عبور باشد.")
+                DialogPopup(
+                        "عبارت یادآوری نباید شامل بخش‌هایی از کلمه عبور باشد",
+                        duration=2500, parent=self
+                        ).show()
                 self.ui.ledPasswordHint.setFocus()
                 return False
 
@@ -171,21 +216,16 @@ class DialogLogin(DialogDraggable):
         new_settings = {
             "HasLoginFormShownBefore": True,
             "IsUserRegisteredSuccessfully":
-                len(self.list_usernames) > 0 or self._is_user_registered_successfully
-        }
+                len(self.list_usernames) > 0  # یعنی قبلا یک یوزر ثیت شده
+                or
+                self._is_user_registered_successfully
+            }
 
         # تغییر و ذخیره تنظیمات
         if not update_settings(new_settings):
-            print("Failed to update settings.")
-
-        # ...
-        # TODO:
-        # if self._is_user_registered_successfully:
-        #     user_info.username = "xxxx"
-        #
-        #     new_user_info = {"Username": user_info.username}
-        #     update_userinfooooooooooooooooooooooooooo(new_user_info)
-        # ...
+            print("Failed to update settings(dialoglogin.py -> write_settings()")
+        else:
+            print("Successfully updated settings(dialoglogin.py -> write_settings())")
 
     # ------------------------------------------------------------------------
 
@@ -205,8 +245,10 @@ class DialogLogin(DialogDraggable):
         self.anim.deleteLater()  # حذف انیمیشن با استفاده از reference مستقیم
         self.anim = None  # جلوگیری از circular reference
 
-    def animateStackedWidgetPages(self, stacked_widget: QStackedWidget, page: QWidget,
-                                  direction: Direction = Direction.LeftToRight) -> None:
+    def animateStackedWidgetPages(
+            self, stacked_widget: QStackedWidget, page: QWidget,
+            direction: Direction = Direction.LeftToRight
+            ) -> None:
         # 1. ابتدا صفحه را مخفی کرده و موقعیت اولیه را تنظیم کنید
         page.show()  # اطمینان از visibility
         page.raise_()  # اطمینان از قرارگیری در بالای stacked widget
@@ -238,10 +280,12 @@ class DialogLogin(DialogDraggable):
         animation.setEasingCurve(QEasingCurve.OutQuint)  # منحنی نرم‌تر
 
         # 6. مدیریت حذف خودکار انیمیشن
-        animation.finished.connect(lambda: (
-            animation.deleteLater(),
-            # print("Animation completed and deleted")  # برای دیباگ
-        ))
+        animation.finished.connect(
+                lambda: (
+                    animation.deleteLater(),
+                    # print("Animation completed and deleted")  # برای دیباگ
+                    )
+                )
 
         animation.start()
 

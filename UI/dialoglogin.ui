@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>325</width>
-    <height>442</height>
+    <width>338</width>
+    <height>453</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -100,7 +100,7 @@ color: rgb(0, 0, 255);
       <item>
        <widget class="QStackedWidget" name="stackedWidgetMain">
         <property name="currentIndex">
-         <number>1</number>
+         <number>0</number>
         </property>
         <widget class="QWidget" name="pageLogin">
          <layout class="QGridLayout" name="gridLayout_3">
@@ -165,7 +165,7 @@ color: rgb(0, 0, 255);
             <item row="0" column="1">
              <widget class="QLineEdit" name="ledUsername">
               <property name="text">
-               <string>root</string>
+               <string>admin</string>
               </property>
               <property name="maxLength">
                <number>15</number>
@@ -264,12 +264,6 @@ color: rgb(0, 0, 255);
               </property>
               <property name="text">
                <string>ورود</string>
-              </property>
-              <property name="autoDefault">
-               <bool>true</bool>
-              </property>
-              <property name="default">
-               <bool>true</bool>
               </property>
              </widget>
             </item>
@@ -384,9 +378,6 @@ color: rgb(0, 0, 255);
               <property name="text">
                <string>ثبت</string>
               </property>
-              <property name="default">
-               <bool>true</bool>
-              </property>
              </widget>
             </item>
             <item>
@@ -492,5 +483,102 @@ color: rgb(0, 0, 255);
  <resources>
   <include location="../RC/resources.qrc"/>
  </resources>
- <connections/>
+ <connections>
+  <connection>
+   <sender>ledUsernameRegistrationPage</sender>
+   <signal>returnPressed()</signal>
+   <receiver>ledPasswordRegistrationPage</receiver>
+   <slot>setFocus()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>116</x>
+     <y>257</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>96</x>
+     <y>292</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>ledPasswordRegistrationPage</sender>
+   <signal>returnPressed()</signal>
+   <receiver>ledPasswordAgainRegistrationPage</receiver>
+   <slot>setFocus()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>212</x>
+     <y>296</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>197</x>
+     <y>332</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>ledPasswordAgainRegistrationPage</sender>
+   <signal>returnPressed()</signal>
+   <receiver>ledPasswordHint</receiver>
+   <slot>setFocus()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>34</x>
+     <y>328</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>50</x>
+     <y>362</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>ledPasswordHint</sender>
+   <signal>returnPressed()</signal>
+   <receiver>btnRegister</receiver>
+   <slot>click()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>139</x>
+     <y>379</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>171</x>
+     <y>423</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>ledUsername</sender>
+   <signal>returnPressed()</signal>
+   <receiver>ledPassword</receiver>
+   <slot>setFocus()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>106</x>
+     <y>322</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>95</x>
+     <y>363</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>ledPassword</sender>
+   <signal>returnPressed()</signal>
+   <receiver>btnLogIn</receiver>
+   <slot>click()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>173</x>
+     <y>367</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>155</x>
+     <y>421</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>

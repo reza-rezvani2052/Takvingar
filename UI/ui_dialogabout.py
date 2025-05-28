@@ -24,7 +24,7 @@ class Ui_DialogAbout(object):
     def setupUi(self, DialogAbout):
         if not DialogAbout.objectName():
             DialogAbout.setObjectName(u"DialogAbout")
-        DialogAbout.resize(351, 511)
+        DialogAbout.resize(282, 392)
         icon = QIcon()
         icon.addFile(u":/app-icon.jpg", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
         DialogAbout.setWindowIcon(icon)

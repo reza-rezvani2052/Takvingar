@@ -1,5 +1,7 @@
-from dataclasses import dataclass
 from enum import Enum
+from dataclasses import dataclass
+
+import DB.database
 
 
 # ======================= اطلاعات کاربر ============================
@@ -15,7 +17,7 @@ user_info = UserInfo()
 @dataclass(frozen=True)
 class CompanyInformation:
     organization_name: str = "Hosfa"
-    organization_domain: str = "http://takvingar.ir/"
+    organization_domain: str = "https://takvingar.ir/"
 
 
 company_info = CompanyInformation()
@@ -35,15 +37,33 @@ app_info = AppInformation()
 # ======================= تنظیمات برنامه ==========================
 @dataclass
 class AppSettings:
-    run_at_startup: bool = False
+    run_at_windows_startup: bool = False
     show_on_top: bool = False
     show_on_tray_on_exit: bool = False
     save_path: str = ""
+    db_data_path: str = DB.database.Connections["CONN_DATA"]["PATH"]
     # ...
     num_of_app_exec: int = 0
 
 
 app_settings = AppSettings()
+
+
+# ====== کلید های تنظیمات برنامه در پایگاه داده (ثابت) =====
+# هر تغییری در جدول مربوطه در پایگاه داده باید در این اعمال شود و بالعکس
+@dataclass(frozen=True)
+class SettingsKeys:
+    has_login_form_shown_before: str = "HasLoginFormShownBefore"
+    is_user_registered_successfully: str = "IsUserRegisteredSuccessfully"
+    run_app_at_windows_startup: str = "RunAppAtWindowsStartup"
+    show_on_top: str = "ShowOnTop"
+    show_on_system_tray_on_exit: str = "ShowOnSystemTrayOnExit"
+    save_path: str = "SavePath"
+    db_data_path: str = "DbDataPath"
+    num_of_app_exec: str = "NumOfAppExec"
+
+
+settings_keys = SettingsKeys()
 
 
 # ================== کدهای خروج برنامه =====================
