@@ -5,24 +5,17 @@
         "UI/dialoglogin.ui",
         "UI/mainwindow.ui",
         "UI/dialogpopup.ui",
-
         "main.py",
         "mainwindow.py",
         "dialogabout.py",
         "dialoglogin.py",
         "dialogpopup.py",
         "dialogdraggable.py",
-
         "build_ui.py",
         "build_bin.py",
-
-        "TXT/NOTES.txt",
-        "TXT/TODO.txt",
-
         "DB/database.py",
         "DB/history.py",
         "DB/settings.py",
         "DB/users.py"
-
     ]
 }

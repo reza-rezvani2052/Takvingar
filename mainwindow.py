@@ -3,12 +3,13 @@ import sys
 import shutil
 import subprocess
 
+import time
 from datetime import datetime, timedelta
 import jdatetime  # تاریخ شمسی
 
 from PySide6.QtCore import QSettings, QTimer
-from PySide6.QtGui import QIcon
-from PySide6.QtWidgets import (QApplication, QFileDialog, QMainWindow, QMessageBox)
+from PySide6.QtGui import QIcon, QMovie, Qt
+from PySide6.QtWidgets import (QApplication, QDialog, QFileDialog, QLabel, QMainWindow, QMessageBox, QVBoxLayout)
 
 # اگر دسترسی خواندنی و نوشتنی به متغیرهای سراسری  بخواهیم
 # باید دستور ایمپورت را به صورت زیر بنویسیم
@@ -17,6 +18,7 @@ import DB.database
 import DB.settings
 from definitions import app_info, app_settings
 from dialogpopup import DialogPopup
+from dialogdraggable import DialogDraggable
 from main import write_app_settings
 from UI.ui_mainwindow import Ui_MainWindow
 
@@ -24,6 +26,33 @@ from UI.ui_mainwindow import Ui_MainWindow
 BACKUP_FOLDER = "backups"
 MAX_BACKUPS = 5
 
+
+######################################################################################################
+
+class BackupProgressDialog(DialogDraggable):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        # self.setWindowTitle("در حال پشتیبان‌گیری")
+        self.setModal(True)
+        # self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
+        # self.setFixedSize(250, 100)
+
+        layout = QVBoxLayout(self)
+        layout.setContentsMargins(25, 25, 25, 25)
+        self.label = QLabel("⏳ در حال پشتیبان گیری. لطفاً منتظر بمانید...", self)
+        self.label.setAlignment(Qt.AlignCenter)
+        layout.addWidget(self.label)
+
+        self.spinner = QLabel(self)
+        self.spinner.setAlignment(Qt.AlignCenter)
+        movie = QMovie(":/img/spinner.gif")
+        self.spinner.setMovie(movie)
+        movie.start()
+        layout.addWidget(self.spinner)
+        self.sizeHint()
+
+
+######################################################################################################
 
 class MainWindow(QMainWindow):
     def __init__(self, parent=None):
@@ -85,6 +114,14 @@ class MainWindow(QMainWindow):
             if not dest_path.lower().endswith(".db"):
                 dest_path += ".db"
 
+            # ...
+            dialog = None
+            t_start = time.time()
+            if show_message and not auto_backup:
+                dialog = BackupProgressDialog(self)
+                QTimer.singleShot(0, dialog.show)  # جلوگیری از فریز UI
+            # ...
+
             shutil.copy2(source_path, dest_path)
 
             if auto_backup:
@@ -99,17 +136,39 @@ class MainWindow(QMainWindow):
                     except Exception as e:
                         print(f"⚠️ خطا در حذف فایل قدیمی: {old_backup} => {e}")
 
+            # ...
+            if dialog:
+                elapsed = time.time() - t_start
+                if elapsed < 4.0:
+                    # QTimer.singleShot(int((5.0 - elapsed) * 1000), dialog.accept)
+                    QTimer.singleShot(
+                            int((4.0 - elapsed) * 1000),
+                            lambda: self.on_backup_finished(dest_path, show_message, dialog)
+                            )
+                else:
+                    dialog.accept()
+
+            # ...
+
             _msg = "✅ نسخه پشتیبان با موفقیت ذخیره شد:\n" + dest_path
-            if show_message:
-                DialogPopup(_msg, duration=4000, parent=self).show()
 
             return True, _msg
 
         except Exception as e:
+            if dialog:
+                dialog.accept()
+
             err_msg = f"در هنگام پشتیبان‌گیری خطایی رخ داد:\n{str(e)}"
             if show_message:
                 QMessageBox.critical(self, "خطا", err_msg)
             return False, err_msg
+
+    def on_backup_finished(self, dest_path, show_message, dialog):
+        _msg = "✅ نسخه پشتیبان با موفقیت ذخیره شد:\n" + dest_path
+        if dialog:
+            dialog.accept()
+        if show_message:
+            DialogPopup(_msg, duration=4000, parent=self).show()
 
     def setup_auto_backup_timer(self):
         timer = QTimer(self)

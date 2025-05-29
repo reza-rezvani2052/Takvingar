@@ -1,3 +1,20 @@
+def build_ui_and_convert_qrc_to_py():
+    from build_ui import convert_qrc_to_py, convert_all_ui_files
+
+    convert_qrc_to_py()
+    convert_all_ui_files()
+
+
+# TODO: در رلیز نهایی برنامه، بعد از ساخت فایل مربوطه، خط زیر غیر فعال شود
+build_ui_and_convert_qrc_to_py()
+
+# NOTE: خطوط بالا حتما باید قبل از سایر دستورات زیر باشند
+# به هشدارهای PEP که PyCharm میده توجه نکن
+# چون در فایل هایی مثل DialogLogin به Resource ها نیاز داریم، بنابراین اول باید ساخته شوند
+# اما در رلیز نهایی قضیه فرق میکند
+
+# ----------------------------------------------------------------------------
+
 import sys
 import time
 
@@ -15,19 +32,6 @@ from definitions import *
 # اگر از from استفاده کنیم، فقط دسترسی خواندنی داریم
 import DB.database
 import DB.settings
-
-
-# ----------------------------------------------------------------------------
-
-def build_ui_and_convert_qrc_to_py():
-    from build_ui import convert_qrc_to_py, convert_all_ui_files
-
-    convert_qrc_to_py()
-    convert_all_ui_files()
-
-
-# TODO: در رلیز نهایی برنامه، بعد از ساخت فایل مربوطه، خط زیر غیر فعال شود
-build_ui_and_convert_qrc_to_py()
 
 
 # ----------------------------------------------------------------------------

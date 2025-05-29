@@ -30,5 +30,7 @@
         <file>img/restart-app.png</file>
         <file>img/search.png</file>
         <file>img/select-all.png</file>
+        <file>img/spinner.gif</file>
     </qresource>
 </RCC>
+
