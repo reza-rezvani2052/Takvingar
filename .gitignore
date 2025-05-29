@@ -89,6 +89,7 @@ CMakeLists.txt.user*
 .qtcreator/
 __pycache__/
 .venv/
+backups/
 
 rc_resources.py
 resources_rc.py

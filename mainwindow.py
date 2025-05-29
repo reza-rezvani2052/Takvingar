@@ -3,10 +3,10 @@ import sys
 import shutil
 import subprocess
 
-from datetime import datetime
+from datetime import datetime, timedelta
 import jdatetime  # تاریخ شمسی
 
-from PySide6.QtCore import QSettings
+from PySide6.QtCore import QSettings, QTimer
 from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import (QApplication, QFileDialog, QMainWindow, QMessageBox)
 
@@ -20,6 +20,10 @@ from dialogpopup import DialogPopup
 from main import write_app_settings
 from UI.ui_mainwindow import Ui_MainWindow
 
+# NOTE: این پوشه در کنار فایل اجرایی برنامه به صورت خودکار ساخته میشود
+BACKUP_FOLDER = "backups"
+MAX_BACKUPS = 5
+
 
 class MainWindow(QMainWindow):
     def __init__(self, parent=None):
@@ -30,6 +34,14 @@ class MainWindow(QMainWindow):
         self.read_settings()
         # ...
         self.connect_signals_to_slots()
+        # ...
+        self.last_backup_time = datetime.min  # زمان آخرین بکاپ
+        self.data_modified_since_backup = False  # آیا داده‌ای از آخرین بکاپ تغییر کرده؟
+
+        self.setup_auto_backup_timer()
+
+        # TODO: وقتی داده‌ای تغییر می‌کند
+        # self.data_modified_since_backup = True
         # ...
 
     def connect_signals_to_slots(self):
@@ -43,50 +55,80 @@ class MainWindow(QMainWindow):
         self.ui.actAbout.triggered.connect(self.actAbout_triggered)
 
     def create_db_backup(self, show_message=True, auto_backup=False) -> tuple[bool, str]:
-        # ایجاد نام پیش‌فرض با تاریخ و زمان جاری به شمسی
-        now_gregorian = datetime.now()
-        now_jalali = jdatetime.datetime.fromgregorian(datetime=now_gregorian)
-        default_name = f"backup_{now_jalali.strftime('%Y-%m-%d_%H-%M-%S')}.db"
-        # ...
-        # گرفتن مسیر ذخیره‌سازی از کاربر
-        # اگر بکاپ بصورت سیستمی و خودکار است نیازی به بازشدن دیالوگ زیر نیست
-        if auto_backup:
-            show_message = False  # اگر بکاپ خودکار هست، پیام‌ها نباید به کاربر نشان داده شود
-            dest_path = default_name
-        else:
-            dest_path, _ = QFileDialog.getSaveFileName(
-                    self, "ذخیره نسخه پشتیبان",
-                    default_name, "Database Files (*.db)"
-                    )
-        # ...
-        if dest_path:
-            try:
-                if not dest_path.lower().endswith(".db"):  # اطمینان از داشتن پسوند .db
-                    dest_path += ".db"
+        try:
+            # ایجاد نام پیش‌فرض با تاریخ و زمان جاری به شمسی
+            now_gregorian = datetime.now()
+            now_jalali = jdatetime.datetime.fromgregorian(datetime=now_gregorian)
+            default_name = f"backup_{now_jalali.strftime('%Y-%m-%d_%H-%M-%S')}.db"
 
-                # بررسی وجود فایل مبدا
-                if not os.path.exists(DB.database.Connections['CONN_DATA']['PATH']):
-                    err_msg = f"فایل پایگاه داده یافت نشد:\n{DB.database.Connections['CONN_DATA']['PATH']}"
-                    if show_message:
-                        QMessageBox.critical(self, "خطا", err_msg)
-                    return False, err_msg
-
-                # کپی فایل
-                shutil.copy2(DB.database.Connections['CONN_DATA']['PATH'], dest_path)
-                _msg = "✅ نسخه پشتیبان با موفقیت ذخیره شد" + "\n" + dest_path
-                if show_message:
-                    DialogPopup(_msg, duration=4000, parent=self).show()
-
-                return True, _msg
-
-            except Exception as e:
-                err_msg = f"در هنگام پشتیبان‌گیری خطایی رخ داد:\n{str(e)}"
+            # بررسی وجود فایل مبدا
+            source_path = DB.database.Connections['CONN_DATA']['PATH']
+            if not os.path.exists(source_path):
+                err_msg = f"فایل پایگاه داده یافت نشد:\n{source_path}"
                 if show_message:
                     QMessageBox.critical(self, "خطا", err_msg)
                 return False, err_msg
 
-        _msg = "نسخه پشتیبان با موفقیت ذخیره شد"
-        return True, _msg
+            # گرفتن مسیر ذخیره‌سازی از کاربر
+            # اگر بکاپ بصورت سیستمی و خودکار است نیازی به بازشدن دیالوگ زیر نیست
+            if auto_backup:
+                show_message = False
+                os.makedirs(BACKUP_FOLDER, exist_ok=True)
+                dest_path = os.path.join(BACKUP_FOLDER, default_name)
+            else:
+                dest_path, _ = QFileDialog.getSaveFileName(
+                        self, "ذخیره نسخه پشتیبان", default_name, "Database Files (*.db)"
+                        )
+                if not dest_path:
+                    return False, "پشتیبان‌گیری لغو شد"
+
+            if not dest_path.lower().endswith(".db"):
+                dest_path += ".db"
+
+            shutil.copy2(source_path, dest_path)
+
+            if auto_backup:
+                # مدیریت تعداد فایل‌های پشتیبان
+                backups = sorted(
+                        [f for f in os.listdir(BACKUP_FOLDER) if f.endswith(".db")],
+                        reverse=True  # جدیدترین ابتدا
+                        )
+                for old_backup in backups[MAX_BACKUPS:]:
+                    try:
+                        os.remove(os.path.join(BACKUP_FOLDER, old_backup))
+                    except Exception as e:
+                        print(f"⚠️ خطا در حذف فایل قدیمی: {old_backup} => {e}")
+
+            _msg = "✅ نسخه پشتیبان با موفقیت ذخیره شد:\n" + dest_path
+            if show_message:
+                DialogPopup(_msg, duration=4000, parent=self).show()
+
+            return True, _msg
+
+        except Exception as e:
+            err_msg = f"در هنگام پشتیبان‌گیری خطایی رخ داد:\n{str(e)}"
+            if show_message:
+                QMessageBox.critical(self, "خطا", err_msg)
+            return False, err_msg
+
+    def setup_auto_backup_timer(self):
+        timer = QTimer(self)
+        timer.timeout.connect(self.check_and_auto_backup)
+        timer.start(5 * 60 * 1000)  # بررسی هر ۵ دقیقه
+
+    def check_and_auto_backup(self):
+        # self.data_modified_since_backup = True
+
+        now = datetime.now()
+        elapsed = now - self.last_backup_time
+
+        # بیشتر ا 30 دقیقه از آخرین بکاپ گذشته باشد
+        if self.data_modified_since_backup and elapsed >= timedelta(minutes=30):
+            success, _ = self.create_db_backup(auto_backup=True)
+            if success:
+                self.last_backup_time = now
+                self.data_modified_since_backup = False
+                # print("Auto Backup created successfully!")
 
     def actBackup_triggered(self):
         self.create_db_backup(show_message=True)
