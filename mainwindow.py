@@ -147,11 +147,8 @@ class MainWindow(QMainWindow):
                             )
                 else:
                     dialog.accept()
-
             # ...
-
             _msg = "✅ نسخه پشتیبان با موفقیت ذخیره شد:\n" + dest_path
-
             return True, _msg
 
         except Exception as e:
