@@ -5,18 +5,18 @@
 CONFIG._DB
 
 
-tbl_settings
+***tbl_settings***
 DONE
 
 ...
 
-tbl_users
+***tbl_users***
 username
 password
 pass_hint
 access_level			# سطح دسترسی (0 = فقط مشاهده، 1 = کامل)
-created_at		# TEXT
-last_login			# TEXT
+created_at		        # TEXT
+last_login		        # TEXT
 
 
 if current_user.access_level < 1:
@@ -27,9 +27,9 @@ if current_user.access_level < 1:
 
 DATA.DB
 
-tbl_project
-tbl_personnel
-tbl_shareholder
+***tbl_project***
+***tbl_personnel***
+***tbl_shareholder***
 
 
 tbl_project_share_distribution 
