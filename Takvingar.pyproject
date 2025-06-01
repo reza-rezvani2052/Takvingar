@@ -16,6 +16,8 @@
         "DB/database.py",
         "DB/history.py",
         "DB/settings.py",
-        "DB/users.py"
+        "DB/users.py",
+        "build_pyc.py",
+        "todo.txt"
     ]
 }
