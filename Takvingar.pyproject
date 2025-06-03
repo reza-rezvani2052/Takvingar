@@ -18,6 +18,8 @@
         "DB/settings.py",
         "DB/users.py",
         "build_pyc.py",
-        "todo.txt"
+        "todo.txt",
+        "UI/dialogbankfee.ui",
+        "dialogbankfee.py"
     ]
 }

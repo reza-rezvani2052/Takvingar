@@ -174,7 +174,7 @@ QStatusBar {
      <x>0</x>
      <y>0</y>
      <width>629</width>
-     <height>26</height>
+     <height>30</height>
     </rect>
    </property>
    <widget class="QMenu" name="mnuFile">
@@ -192,9 +192,9 @@ QStatusBar {
     <property name="title">
      <string>ابزارها</string>
     </property>
-    <addaction name="mnuBankFeeCalculator"/>
+    <addaction name="actBankFeeCalculator"/>
     <addaction name="separator"/>
-    <addaction name="mnuInvoiceCreator"/>
+    <addaction name="actInvoiceCreator"/>
    </widget>
    <widget class="QMenu" name="mnuHelp">
     <property name="title">
@@ -279,12 +279,12 @@ QStatusBar {
     <string>Ctrl+Q</string>
    </property>
   </action>
-  <action name="mnuBankFeeCalculator">
+  <action name="actBankFeeCalculator">
    <property name="text">
     <string>محاسبه کارمزد بانک</string>
    </property>
   </action>
-  <action name="mnuInvoiceCreator">
+  <action name="actInvoiceCreator">
    <property name="text">
     <string>فاکتور نویس</string>
    </property>

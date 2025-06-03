@@ -31,6 +31,6 @@
         <file>img/search.png</file>
         <file>img/select-all.png</file>
         <file>img/spinner.gif</file>
+        <file>img/copy.png</file>
     </qresource>
 </RCC>
-

@@ -17,9 +17,11 @@ from PySide6.QtWidgets import (QApplication, QDialog, QFileDialog, QLabel, QMain
 # اگر از from استفاده کنیم، فقط دسترسی خواندنی داریم
 import DB.database
 import DB.settings
+
 from definitions import app_info, app_settings, user_info
 from dialogpopup import DialogPopup
 from dialogdraggable import DialogDraggable
+
 from main import write_app_settings
 from UI.ui_mainwindow import Ui_MainWindow
 
@@ -83,6 +85,8 @@ class MainWindow(QMainWindow):
 
         self.ui.actBackup.triggered.connect(self.actBackup_triggered)
         self.ui.actRestoreBackup.triggered.connect(self.actRestoreBackup_triggered)
+
+        self.ui.actBankFeeCalculator.triggered.connect(self.actBankFeeCalculator_triggered)
 
         self.ui.actHelp.triggered.connect(self.actHelp_triggered)
         self.ui.actAbout.triggered.connect(self.actAbout_triggered)
@@ -291,6 +295,12 @@ class MainWindow(QMainWindow):
 
         subprocess.Popen([sys.executable] + sys.argv)
         QApplication.quit()
+
+    def actBankFeeCalculator_triggered(self):
+        from dialogbankfee import DialogBankFee
+        bankfee_dialog = DialogBankFee(self)
+        # bankfee_dialog.exec()
+        bankfee_dialog.show()
 
     @staticmethod
     def actHelp_triggered():
