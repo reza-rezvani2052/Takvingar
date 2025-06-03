@@ -100,7 +100,7 @@ resources_rc.py
 *.user
 *.pyproject.user
 *.pyproject.user.*
-#ui_*.py
+ui_*.py
 
 #Pyinstaller's :
 build/
