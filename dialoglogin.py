@@ -1,13 +1,17 @@
 import re
+import logging
+from datetime import datetime
+import jdatetime  # تاریخ شمسی
 
 from UI.ui_dialoglogin import Ui_DialogLogin
 from dialogpopup import DialogPopup
 from dialogdraggable import DialogDraggable
 
-from definitions import Direction, user_info
+# import DB.users
 from DB.users import (add_user_to_db, get_pass_hint, get_all_username,
-                      check_password)
+                      check_password, set_user_last_login)
 from DB.settings import update_settings
+from definitions import Direction, user_info
 
 from PySide6.QtCore import Qt, QPoint, QEasingCurve, QPropertyAnimation
 from PySide6.QtWidgets import QStackedWidget, QWidget, QCompleter
@@ -81,12 +85,19 @@ class DialogLogin(DialogDraggable):
             self.popup = DialogPopup(
                     "نام کاربری یا کلمه عبور نادرست است" + "\n" +
                     "تعداد تلاش باقی مانده:" + "\n"
-                                                f" {remaining} "
+                                               f" {remaining} "
                     , duration=2500, parent=self
                     )
             self.popup.show()
 
         else:
+            user_info.username = username
+
+            # set user last login
+            now_jalali = jdatetime.datetime.fromgregorian(datetime=datetime.now())
+            last_login = f"{now_jalali.strftime('%Y-%m-%d_%H-%M-%S')}"
+            set_user_last_login(user_info.username, last_login)
+
             self.animateAndAccept()
 
     def btnPasswordHint_clicked(self):
@@ -120,9 +131,10 @@ class DialogLogin(DialogDraggable):
         # ...
         username = self.ui.ledUsernameRegistrationPage.text().strip()
         password = self.ui.ledPasswordRegistrationPage.text()
-        reminder = self.ui.ledPasswordHint.text().strip()
+        pass_hint = self.ui.ledPasswordHint.text().strip()
 
-        success, message = self.register_user(username, password, reminder)
+        success, message = \
+            self.register_user(username, password, pass_hint, access_level=1)
         if success:
             self._is_user_registered_successfully = True
             self.write_settings()
@@ -193,7 +205,7 @@ class DialogLogin(DialogDraggable):
         return True
 
     @staticmethod
-    def register_user(username, password, pass_hint, access_level=None) -> tuple[bool, str]:
+    def register_user(username, password, pass_hint, access_level) -> tuple[bool, str]:
         return add_user_to_db(username, password, pass_hint, access_level)
 
     # ------------------------------------------------------------------------
@@ -223,9 +235,9 @@ class DialogLogin(DialogDraggable):
 
         # تغییر و ذخیره تنظیمات
         if not update_settings(new_settings):
-            print("Failed to update settings(dialoglogin.py -> write_settings()")
+            logging.debug("Failed to update settings(dialoglogin.py -> write_settings()")
         else:
-            print("Successfully updated settings(dialoglogin.py -> write_settings())")
+            logging.info("Successfully updated settings(dialoglogin.py -> write_settings())")
 
     # ------------------------------------------------------------------------
 
@@ -283,7 +295,7 @@ class DialogLogin(DialogDraggable):
         animation.finished.connect(
                 lambda: (
                     animation.deleteLater(),
-                    # print("Animation completed and deleted")  # برای دیباگ
+                    # logging.debug("Animation completed and deleted")  # برای دیباگ
                     )
                 )
 

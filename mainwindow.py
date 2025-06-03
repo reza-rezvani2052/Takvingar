@@ -1,6 +1,7 @@
 import os
 import sys
 import shutil
+import logging
 import subprocess
 
 import time
@@ -16,7 +17,7 @@ from PySide6.QtWidgets import (QApplication, QDialog, QFileDialog, QLabel, QMain
 # اگر از from استفاده کنیم، فقط دسترسی خواندنی داریم
 import DB.database
 import DB.settings
-from definitions import app_info, app_settings
+from definitions import app_info, app_settings, user_info
 from dialogpopup import DialogPopup
 from dialogdraggable import DialogDraggable
 from main import write_app_settings
@@ -67,6 +68,7 @@ class MainWindow(QMainWindow):
         self.last_backup_time = datetime.min  # زمان آخرین بکاپ
         self.data_modified_since_backup = False  # آیا داده‌ای از آخرین بکاپ تغییر کرده؟
 
+        self.check_user_access_level()
         self.warmup_dialogs()
 
         self.setup_auto_backup_timer()
@@ -84,6 +86,29 @@ class MainWindow(QMainWindow):
 
         self.ui.actHelp.triggered.connect(self.actHelp_triggered)
         self.ui.actAbout.triggered.connect(self.actAbout_triggered)
+
+    def check_user_access_level(self):
+        username_fa = ""
+        if user_info.access_level < 1:  # Limited user
+            # TODO: * Disable some features & menus
+
+            self.ui.actBackup.setEnabled(False)
+            self.ui.actRestoreBackup.setEnabled(False)
+
+            # self.ui.mnuManagement.setEnabled(False)
+            for action in self.ui.mnuManagement.actions():
+                action.setEnabled(False)
+
+            # self.ui.mnuTools.setEnabled(False)
+            for action in self.ui.mnuTools.actions():
+                action.setEnabled(False)
+
+            self.ui.statusbar.showMessage(user_info.username)
+            username_fa = f"({user_info.username})کاربر محدود"
+        else:
+            username_fa = f"({user_info.username})مدیر سیستم"
+
+        self.ui.statusbar.showMessage(username_fa)
 
     def warmup_dialogs(self):
         # NOTE: در اینجا وارم آپ انجام بشه
@@ -114,8 +139,8 @@ class MainWindow(QMainWindow):
                 dest_path = os.path.join(BACKUP_FOLDER, default_name)
             else:
                 dest_path, _ = QFileDialog.getSaveFileName(
-                    self, "ذخیره نسخه پشتیبان", default_name, "Database Files (*.db)"
-                )
+                        self, "ذخیره نسخه پشتیبان", default_name, "Database Files (*.db)"
+                        )
                 if not dest_path:
                     return False, "پشتیبان‌گیری لغو شد"
 
@@ -135,14 +160,14 @@ class MainWindow(QMainWindow):
             if auto_backup:
                 # مدیریت تعداد فایل‌های پشتیبان
                 backups = sorted(
-                    [f for f in os.listdir(BACKUP_FOLDER) if f.endswith(".db")],
-                    reverse=True  # جدیدترین ابتدا
-                )
+                        [f for f in os.listdir(BACKUP_FOLDER) if f.endswith(".db")],
+                        reverse=True  # جدیدترین ابتدا
+                        )
                 for old_backup in backups[MAX_BACKUPS:]:
                     try:
                         os.remove(os.path.join(BACKUP_FOLDER, old_backup))
                     except Exception as e:
-                        print(f"⚠️ خطا در حذف فایل قدیمی: {old_backup} => {e}")
+                        logging.debug(f"⚠️ خطا در حذف فایل قدیمی: {old_backup} => {e}")
 
             # ...
             if dialog:
@@ -150,9 +175,9 @@ class MainWindow(QMainWindow):
                 if elapsed < 3.0:
                     # QTimer.singleShot(int((5.0 - elapsed) * 1000), dialog.accept)
                     QTimer.singleShot(
-                        int((3.0 - elapsed) * 1000),
-                        lambda: self.on_backup_finished(dest_path, show_message, dialog)
-                    )
+                            int((3.0 - elapsed) * 1000),
+                            lambda: self.on_backup_finished(dest_path, show_message, dialog)
+                            )
                 else:
                     dialog.accept()
             # ...
@@ -192,7 +217,7 @@ class MainWindow(QMainWindow):
             if success:
                 self.last_backup_time = now
                 self.data_modified_since_backup = False
-                # print("Auto Backup created successfully!")
+                logging.debug("Auto Backup created successfully!")
 
     def actBackup_triggered(self):
         self.create_db_backup(show_message=True)
@@ -212,9 +237,9 @@ class MainWindow(QMainWindow):
         msg_box = QMessageBox(self)
         msg_box.setWindowTitle("راه اندازی مجدد")
         msg_box.setText(
-            "پس از بازیابی نسخه پشتیبان، برنامه بسته و دوباره اجرا خواهد شد"
-            "\n" + "آیا مایل به ادامه کار هستید؟",
-        )
+                "پس از بازیابی نسخه پشتیبان، برنامه بسته و دوباره اجرا خواهد شد"
+                "\n" + "آیا مایل به ادامه کار هستید؟",
+                )
         msg_box.setIcon(QMessageBox.Question)
         msg_box.setWindowIcon(QIcon(":/app-icon.jpg"))
         yes_button = msg_box.addButton("بله", QMessageBox.YesRole)
@@ -230,9 +255,9 @@ class MainWindow(QMainWindow):
 
             if self.are_paths_equal(
                     new_db_path, DB.database.Connections['CONN_DATA']['PATH']
-            ):
+                    ):
                 _msg = "فایل انتخاب‌شده برای بازگردانی، همان فایل پایگاه‌داده فعلی است.\n" \
-                       "لطفاً یک فایل بکاپ متفاوت انتخاب کنید."
+                       "لطفاً یک فایل پشتیبان دیگر انتخاب کنید."
                 DialogPopup(_msg, duration=6000, parent=self).show()
                 return
 

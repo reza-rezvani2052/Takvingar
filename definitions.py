@@ -1,13 +1,12 @@
 from enum import Enum
 from dataclasses import dataclass
 
-import DB.database
-
 
 # ======================= اطلاعات کاربر ============================
 @dataclass
 class UserInfo:
     username: str = ""
+    access_level: int = None  # 1=Full access, 0=Read only
 
 
 user_info = UserInfo()
@@ -41,7 +40,7 @@ class AppSettings:
     show_on_top: bool = False
     show_on_tray_on_exit: bool = False
     save_path: str = ""
-    db_data_path: str = DB.database.Connections["CONN_DATA"]["PATH"]
+    db_data_path: str = ""
     # ...
     num_of_app_exec: int = 0
 

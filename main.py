@@ -15,6 +15,8 @@ build_ui_and_convert_qrc_to_py()
 
 # ----------------------------------------------------------------------------
 
+import logging
+
 import sys
 import time
 
@@ -22,16 +24,28 @@ from PySide6.QtCore import Qt
 from PySide6.QtGui import QPixmap
 from PySide6.QtWidgets import (QApplication, QSplashScreen, QMessageBox)
 
-from dialoglogin import DialogLogin
-
 # import definitions
 from definitions import *
+
+from dialoglogin import DialogLogin
 
 # اگر دسترسی خواندنی و نوشتنی به متغیرهای سراسری  بخواهیم
 # باید دستور ایمپورت را به صورت زیر بنویسیم
 # اگر از from استفاده کنیم، فقط دسترسی خواندنی داریم
 import DB.database
 import DB.settings
+import DB.users
+
+# ----------------------------------------------------------------------------
+
+# اتخاب حالت توسعه یا انتشار
+DEBUG_MODE = True
+
+# پیکربندی logging
+logging.basicConfig(
+        level=logging.DEBUG if DEBUG_MODE else logging.WARNING,
+        format='[%(levelname)s] %(message)s'
+        )
 
 
 # ----------------------------------------------------------------------------
@@ -51,11 +65,14 @@ def has_login_form_shown_before_and_registered() -> bool:
     # دریافت مقادیر به صورت امن
     has_shown_before = bool(int(settings.get("HasLoginFormShownBefore", 0)))
     is_user_registered_successfully = bool(int(settings.get("IsUserRegisteredSuccessfully", 0)))
-    # print(f"has_shown_before = {has_shown_before} - is_user_registered_successfully = {is_user_registered_successfully}")
+    logging.debug(
+            f"has_shown_before = {has_shown_before} "
+            f" is_user_registered_successfully = {is_user_registered_successfully}"
+            )
 
     # نمایش برای تست (اختیاری)
     # for key in options_keys:
-    #     print(f"{key} => {settings.get(key, 'Default Value')}")
+    #     logging.debug(f"{key} => {settings.get(key, 'Default Value')}")
 
     return has_shown_before and is_user_registered_successfully
 
@@ -66,7 +83,7 @@ def read_app_settings():
     #  بارگذاری تمام تنظیمات
     settings = DB.settings.get_all_settings()
     if settings is None:
-        print("read_app_settings() -> settings is None")
+        logging.info(f"read_app_settings() -> settings is None")
         return None
 
     app_settings.run_at_windows_startup = (
@@ -99,13 +116,13 @@ def read_app_settings():
 
     # ...
 
-    print(f"app_settings.run_at_windows_startup = {app_settings.run_at_windows_startup}")
-    # print(f"type(app_settings.run_at_windows_startup)= {type(app_settings.run_at_windows_startup)}")  #  <class 'str'>
-    print(f"app_settings.show_on_top = {app_settings.show_on_top}")
-    print(f"app_settings.show_on_tray_on_exit = {app_settings.show_on_tray_on_exit}")
-    print(f"app_settings.save_path = {app_settings.save_path}")
-    print(f"app_settings.db_data_path = {app_settings.db_data_path}")
-    print(f"app_settings.num_of_app_exec = {app_settings.num_of_app_exec}")
+    logging.info(f"app_settings.run_at_windows_startup = {app_settings.run_at_windows_startup}")
+    # logging.info(f"type(app_settings.run_at_windows_startup)= {type(app_settings.run_at_windows_startup)}")  #  <class 'str'>
+    logging.info(f"app_settings.show_on_top = {app_settings.show_on_top}")
+    logging.info(f"app_settings.show_on_tray_on_exit = {app_settings.show_on_tray_on_exit}")
+    logging.info(f"app_settings.save_path = {app_settings.save_path}")
+    logging.info(f"app_settings.db_data_path = {app_settings.db_data_path}")
+    logging.info(f"app_settings.num_of_app_exec = {app_settings.num_of_app_exec}")
 
     # ...
 
@@ -136,14 +153,14 @@ def write_app_settings():
         # "NumOfAppExec": app_settings.num_of_app_exec,
 
         }
-    print("--------------------------------------------------------------")
-    # TODO: بعد از اطمینان از عملکرد صحیح، این دستورات حذف و یا بهینه شوند
-    print("new_settings: \n", new_settings)
+
+    logging.info("--------------------------------------------------------------")
+    logging.info("new_settings: \n", new_settings)
     if not DB.settings.update_settings(new_settings):
-        print("Failed to update settings(write_app_settings())")
+        logging.warning("Failed to update settings(write_app_settings())")
     else:
-        print("write_app_settings() is Done")
-    print("--------------------------------------------------------------")
+        logging.info("write_app_settings() is Done")
+    logging.info("--------------------------------------------------------------")
 
 
 # ...
@@ -176,7 +193,7 @@ if __name__ == "__main__":
     # --------------------------------------------------------------------------------------
 
     read_app_settings()
-    # print("app_settings.db_data_path ===> ", app_settings.db_data_path)   # OK
+    logging.debug(f"app_settings.db_data_path: {app_settings.db_data_path}")  # OK
 
     is_connected_successfully = DB.database.try_connect_to_db_data(app_settings.db_data_path)
     if not is_connected_successfully:  # خطاها و پیامها در تابع بالا هندل میشوند
@@ -196,6 +213,9 @@ if __name__ == "__main__":
         app.quit()
         exit(-1)
 
+    user_info.access_level = DB.users.get_user_access_level(user_info.username)
+    logging.debug(f"user_access_level {user_info.username} = {user_info.access_level}")
+
     # ...
 
     from mainwindow import MainWindow
@@ -207,7 +227,7 @@ if __name__ == "__main__":
     app.processEvents()  # اجازه میدیم کمی سیستم پردازش کنه
 
     # ...
-    time.sleep(1)  # TODO:
+    # time.sleep(1)  # TODO:
     # ...
 
     window = MainWindow()

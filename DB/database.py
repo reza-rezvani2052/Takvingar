@@ -1,4 +1,5 @@
 import os
+import logging
 
 from PySide6.QtGui import QIcon
 from PySide6.QtSql import QSqlDatabase, QSqlQuery
@@ -61,7 +62,8 @@ def connect_to_db(key: str) -> bool:
     if not status:
         return False, message
     # ...
-    # print("inside connect_to_db() = ", Connections[key]["CONN"])
+    # logging.info(f"inside connect_to_db() =  {Connections[key]['CONN']}")
+
     return True, f"اتصال به پایگاه داده مورد نظر با موفقیت انجام شد:\n{Connections[key]['PATH']}"
 
 
@@ -166,9 +168,9 @@ def close_all_db_connections():
         if conn:
             try:
                 conn.close()
-                print(f"Connection '{key}' closed.")
+                logging.info(f"Connection '{key}' closed.")
             except Exception as e:
-                print(f"Error closing '{key}': {e}")
+                logging.debug(f"Error closing '{key}': {e}")
     # Connections.clear()
 
 
@@ -185,11 +187,11 @@ def close_db_connection(*keys):
                 if conn:
                     try:
                         conn.close()
-                        print(f"Connection '{key}' closed.")
+                        logging.info(f"Connection '{key}' closed.")
                     except Exception as e:
-                        print(f"Error closing '{key}': {e}")
+                        logging.debug(f"Error closing '{key}': {e}")
                 else:
-                    print(f"No active connection object in '{key}'.")
+                    logging.debug(f"No active connection object in '{key}'.")
                 del Connections[key]  # ???
             else:
-                print(f"No connection entry for '{key}'.")
+                logging.debug(f"No connection entry for '{key}'.")
