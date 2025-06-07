@@ -26,6 +26,12 @@
      <property name="spacing">
       <number>0</number>
      </property>
+     <property name="leftMargin">
+      <number>1</number>
+     </property>
+     <property name="rightMargin">
+      <number>1</number>
+     </property>
      <item>
       <widget class="QLineEdit" name="ledSatna">
        <property name="readOnly">
@@ -54,6 +60,12 @@
     <layout class="QHBoxLayout" name="horizontalLayout">
      <property name="spacing">
       <number>0</number>
+     </property>
+     <property name="leftMargin">
+      <number>1</number>
+     </property>
+     <property name="rightMargin">
+      <number>1</number>
      </property>
      <item>
       <widget class="QLineEdit" name="ledCardi">
@@ -93,6 +105,12 @@
     <layout class="QHBoxLayout" name="horizontalLayout_2">
      <property name="spacing">
       <number>0</number>
+     </property>
+     <property name="leftMargin">
+      <number>1</number>
+     </property>
+     <property name="rightMargin">
+      <number>1</number>
      </property>
      <item>
       <widget class="QLineEdit" name="ledPaya">

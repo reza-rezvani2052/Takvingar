@@ -1,3 +1,5 @@
+#! python3
+
 def build_ui_and_convert_qrc_to_py():
     from build_ui import convert_qrc_to_py, convert_all_ui_files
 
@@ -47,6 +49,16 @@ logging.basicConfig(
         format='[%(levelname)s] %(message)s'
         )
 
+
+# logging.basicConfig(
+#         filename='log.txt',
+#         level=logging.DEBUG, format='[%(levelname)s] %(message)s'
+#         )
+# logging.disable(logging.DEBUG)
+# logging.disable(logging.INFO)
+# logging.disable(logging.WARNING)
+# logging.disable(logging.ERROR)
+# logging.disable(logging.CRITICAL)
 
 # ----------------------------------------------------------------------------
 
