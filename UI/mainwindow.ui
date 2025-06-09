@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>629</width>
-    <height>340</height>
+    <width>771</width>
+    <height>359</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -173,7 +173,7 @@ QStatusBar {
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>629</width>
+     <width>771</width>
      <height>30</height>
     </rect>
    </property>
@@ -181,12 +181,14 @@ QStatusBar {
     <property name="title">
      <string>فایل</string>
     </property>
-    <addaction name="actRestoreBackup"/>
     <addaction name="actBackup"/>
+    <addaction name="actRestoreBackup"/>
+    <addaction name="separator"/>
+    <addaction name="actExportDataToExcel"/>
+    <addaction name="actImportDataFromExcel"/>
     <addaction name="separator"/>
     <addaction name="actRestartApp"/>
     <addaction name="actQuit"/>
-    <addaction name="separator"/>
    </widget>
    <widget class="QMenu" name="mnuTools">
     <property name="title">
@@ -335,6 +337,24 @@ QStatusBar {
    </property>
    <property name="text">
     <string>راه اندازی مجد</string>
+   </property>
+  </action>
+  <action name="actImportDataFromExcel">
+   <property name="icon">
+    <iconset resource="../RC/resources.qrc">
+     <normaloff>:/img/excel-import.png</normaloff>:/img/excel-import.png</iconset>
+   </property>
+   <property name="text">
+    <string>بارگذاری داده‌ها از اکسل</string>
+   </property>
+  </action>
+  <action name="actExportDataToExcel">
+   <property name="icon">
+    <iconset resource="../RC/resources.qrc">
+     <normaloff>:/img/excel-export.png</normaloff>:/img/excel-export.png</iconset>
+   </property>
+   <property name="text">
+    <string>ذخیره داده‌ها در اکسل</string>
    </property>
   </action>
  </widget>

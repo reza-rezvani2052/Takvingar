@@ -86,6 +86,9 @@ class MainWindow(QMainWindow):
         self.ui.actBackup.triggered.connect(self.actBackup_triggered)
         self.ui.actRestoreBackup.triggered.connect(self.actRestoreBackup_triggered)
 
+        self.ui.actExportDataToExcel.triggered.connect(self.actExportDataToExcel_triggered)
+        self.ui.actImportDataFromExcel.triggered.connect(self.actImportDataFromExcel_triggered)
+
         self.ui.actBankFeeCalculator.triggered.connect(self.actBankFeeCalculator_triggered)
 
         self.ui.actHelp.triggered.connect(self.actHelp_triggered)
@@ -98,6 +101,9 @@ class MainWindow(QMainWindow):
 
             self.ui.actBackup.setEnabled(False)
             self.ui.actRestoreBackup.setEnabled(False)
+
+            self.ui.actExportDataToExcel.setEnabled(False)
+            self.ui.actImportDataFromExcel.setEnabled(False)
 
             # self.ui.mnuManagement.setEnabled(False)
             for action in self.ui.mnuManagement.actions():
@@ -281,18 +287,21 @@ class MainWindow(QMainWindow):
         else:
             return
 
+    def actExportDataToExcel_triggered(self):
+        # TODO:
+        pass
+
+    def actImportDataFromExcel_triggered(self):
+        # TODO:
+        pass
+
     def actQuit_triggered(self):
         self.prepare_to_close(write_settings=False)
         QApplication.quit()
 
     def actRestartApp_triggered(self):
         self.prepare_to_close(write_settings=False)
-
         # ...
-        # NOTE:
-        # در پای چارم، هنگام ریست برنامه، خوب عمل نمیکنه اما اگر از خط فرمان
-        # اجرا شود مشکلی ندارد. بعدا در انتشار نهایی برنامه این را تست کنم
-
         subprocess.Popen([sys.executable] + sys.argv)
         QApplication.quit()
 

@@ -17,10 +17,8 @@ build_ui_and_convert_qrc_to_py()
 
 # ----------------------------------------------------------------------------
 
-import logging
-
 import sys
-import time
+import logging
 
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QPixmap
@@ -54,7 +52,7 @@ logging.basicConfig(
 #         filename='log.txt',
 #         level=logging.DEBUG, format='[%(levelname)s] %(message)s'
 #         )
-# logging.disable(logging.DEBUG)
+logging.disable(logging.DEBUG)
 # logging.disable(logging.INFO)
 # logging.disable(logging.WARNING)
 # logging.disable(logging.ERROR)
@@ -239,13 +237,9 @@ if __name__ == "__main__":
     app.processEvents()  # اجازه میدیم کمی سیستم پردازش کنه
 
     # ...
-    # time.sleep(1)  # TODO:
-    # ...
-
     window = MainWindow()
     window.show()
 
-    # ...
     splash.finish(window)
     # ...
 

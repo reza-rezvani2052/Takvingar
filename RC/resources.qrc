@@ -32,5 +32,7 @@
         <file>img/select-all.png</file>
         <file>img/spinner.gif</file>
         <file>img/copy.png</file>
+        <file>img/excel-export.png</file>
+        <file>img/excel-import.png</file>
     </qresource>
 </RCC>
