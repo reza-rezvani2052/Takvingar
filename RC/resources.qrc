@@ -34,5 +34,6 @@
         <file>img/copy.png</file>
         <file>img/excel-export.png</file>
         <file>img/excel-import.png</file>
+        <file>img/ok.png</file>
     </qresource>
 </RCC>

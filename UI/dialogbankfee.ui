@@ -6,9 +6,15 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>270</width>
-    <height>161</height>
+    <width>471</width>
+    <height>257</height>
    </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
   </property>
   <property name="windowTitle">
    <string>محاسبه کارمزد بانک</string>
@@ -20,120 +26,302 @@
   <property name="layoutDirection">
    <enum>Qt::LayoutDirection::RightToLeft</enum>
   </property>
-  <layout class="QGridLayout" name="gridLayout">
-   <item row="3" column="1">
-    <layout class="QHBoxLayout" name="horizontalLayout_3">
-     <property name="spacing">
-      <number>0</number>
-     </property>
-     <property name="leftMargin">
-      <number>1</number>
-     </property>
-     <property name="rightMargin">
-      <number>1</number>
-     </property>
-     <item>
-      <widget class="QLineEdit" name="ledSatna">
-       <property name="readOnly">
-        <bool>true</bool>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QToolButton" name="btnCopySatna">
-       <property name="icon">
-        <iconset resource="../RC/resources.qrc">
-         <normaloff>:/img/copy.png</normaloff>:/img/copy.png</iconset>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </item>
-   <item row="3" column="0">
-    <widget class="QLabel" name="label_3">
-     <property name="text">
-      <string>حواله ساتنا:</string>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="1">
-    <layout class="QHBoxLayout" name="horizontalLayout">
-     <property name="spacing">
-      <number>0</number>
-     </property>
-     <property name="leftMargin">
-      <number>1</number>
-     </property>
-     <property name="rightMargin">
-      <number>1</number>
-     </property>
-     <item>
-      <widget class="QLineEdit" name="ledCardi">
-       <property name="readOnly">
-        <bool>true</bool>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QToolButton" name="btnCopyCardi">
-       <property name="icon">
-        <iconset resource="../RC/resources.qrc">
-         <normaloff>:/img/copy.png</normaloff>:/img/copy.png</iconset>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </item>
+  <layout class="QGridLayout" name="gridLayout_2">
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
+    <number>0</number>
+   </property>
    <item row="0" column="0">
-    <widget class="QLabel" name="label">
-     <property name="text">
-      <string>مبلغ(ریال) :</string>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="1">
-    <widget class="QLineEdit" name="ledValue"/>
-   </item>
-   <item row="2" column="0">
-    <widget class="QLabel" name="label_2">
-     <property name="text">
-      <string>حواله پایا:</string>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="1">
-    <layout class="QHBoxLayout" name="horizontalLayout_2">
-     <property name="spacing">
+    <widget class="QStackedWidget" name="stackedWidget">
+     <property name="currentIndex">
       <number>0</number>
      </property>
-     <property name="leftMargin">
-      <number>1</number>
-     </property>
-     <property name="rightMargin">
-      <number>1</number>
-     </property>
-     <item>
-      <widget class="QLineEdit" name="ledPaya">
-       <property name="readOnly">
-        <bool>true</bool>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QToolButton" name="btnCopyPaya">
-       <property name="icon">
-        <iconset resource="../RC/resources.qrc">
-         <normaloff>:/img/copy.png</normaloff>:/img/copy.png</iconset>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </item>
-   <item row="1" column="0">
-    <widget class="QLabel" name="label_4">
-     <property name="text">
-      <string>کارت به کارت:</string>
-     </property>
+     <widget class="QWidget" name="pageCalculation">
+      <layout class="QGridLayout" name="gridLayout">
+       <item row="0" column="0">
+        <widget class="QLabel" name="label">
+         <property name="text">
+          <string>مبلغ(ریال) :</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <layout class="QHBoxLayout" name="horizontalLayout_4">
+         <property name="spacing">
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="QLineEdit" name="ledValue">
+           <property name="maxLength">
+            <number>12</number>
+           </property>
+           <property name="clearButtonEnabled">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QToolButton" name="btnBankFeeSettings">
+           <property name="toolTip">
+            <string>تنظیمات کارمزد بانکی</string>
+           </property>
+           <property name="icon">
+            <iconset resource="../RC/resources.qrc">
+             <normaloff>:/img/options.png</normaloff>:/img/options.png</iconset>
+           </property>
+           <property name="autoRaise">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item row="1" column="1">
+        <widget class="QLabel" name="lblLedValueNum2String">
+         <property name="text">
+          <string>صفر!</string>
+         </property>
+         <property name="wordWrap">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0">
+        <widget class="QLabel" name="label_4">
+         <property name="text">
+          <string>کارت به کارت:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="1">
+        <layout class="QHBoxLayout" name="horizontalLayout">
+         <property name="spacing">
+          <number>0</number>
+         </property>
+         <property name="leftMargin">
+          <number>1</number>
+         </property>
+         <property name="rightMargin">
+          <number>2</number>
+         </property>
+         <item>
+          <widget class="QLineEdit" name="ledCardi">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="text">
+            <string>2000</string>
+           </property>
+           <property name="readOnly">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QToolButton" name="btnCopyCardi">
+           <property name="icon">
+            <iconset resource="../RC/resources.qrc">
+             <normaloff>:/img/copy.png</normaloff>:/img/copy.png</iconset>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item row="3" column="0">
+        <widget class="QLabel" name="label_2">
+         <property name="text">
+          <string>حواله پایا:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="1">
+        <layout class="QHBoxLayout" name="horizontalLayout_2">
+         <property name="spacing">
+          <number>0</number>
+         </property>
+         <property name="leftMargin">
+          <number>1</number>
+         </property>
+         <property name="rightMargin">
+          <number>2</number>
+         </property>
+         <item>
+          <widget class="QLineEdit" name="ledPaya">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="readOnly">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QToolButton" name="btnCopyPaya">
+           <property name="icon">
+            <iconset resource="../RC/resources.qrc">
+             <normaloff>:/img/copy.png</normaloff>:/img/copy.png</iconset>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item row="4" column="0">
+        <widget class="QLabel" name="label_3">
+         <property name="text">
+          <string>حواله ساتنا:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="1">
+        <layout class="QHBoxLayout" name="horizontalLayout_3">
+         <property name="spacing">
+          <number>0</number>
+         </property>
+         <property name="leftMargin">
+          <number>1</number>
+         </property>
+         <property name="rightMargin">
+          <number>2</number>
+         </property>
+         <item>
+          <widget class="QLineEdit" name="ledSatna">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="readOnly">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QToolButton" name="btnCopySatna">
+           <property name="icon">
+            <iconset resource="../RC/resources.qrc">
+             <normaloff>:/img/copy.png</normaloff>:/img/copy.png</iconset>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="pageSettings">
+      <layout class="QGridLayout" name="gridLayout_3">
+       <item row="0" column="0">
+        <widget class="QTableWidget" name="tableWidget">
+         <column>
+          <property name="text">
+           <string>نوع عملیات</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>نحوه محاسبه</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>مقدار</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>حداقل مبلغ</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>حداکثر مبلغ</string>
+          </property>
+         </column>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <layout class="QHBoxLayout" name="horizontalLayout_5">
+         <property name="spacing">
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="QToolButton" name="btnRemove">
+           <property name="toolTip">
+            <string>حذف </string>
+           </property>
+           <property name="icon">
+            <iconset resource="../RC/resources.qrc">
+             <normaloff>:/img/remove.png</normaloff>:/img/remove.png</iconset>
+           </property>
+           <property name="autoRaise">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QToolButton" name="btnAdd">
+           <property name="toolTip">
+            <string>افزودن</string>
+           </property>
+           <property name="icon">
+            <iconset resource="../RC/resources.qrc">
+             <normaloff>:/img/add.png</normaloff>:/img/add.png</iconset>
+           </property>
+           <property name="autoRaise">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer">
+           <property name="orientation">
+            <enum>Qt::Orientation::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>388</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QToolButton" name="btnCancel">
+           <property name="toolTip">
+            <string>لغو</string>
+           </property>
+           <property name="icon">
+            <iconset resource="../RC/resources.qrc">
+             <normaloff>:/img/cancel.png</normaloff>:/img/cancel.png</iconset>
+           </property>
+           <property name="autoRaise">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QToolButton" name="btnOk">
+           <property name="toolTip">
+            <string>تایید</string>
+           </property>
+           <property name="icon">
+            <iconset resource="../RC/resources.qrc">
+             <normaloff>:/img/ok.png</normaloff>:/img/ok.png</iconset>
+           </property>
+           <property name="autoRaise">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </widget>
     </widget>
    </item>
   </layout>
